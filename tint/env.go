@@ -17,6 +17,7 @@ func Initialize(w io.Writer, debug bool) {
 	exe, _ := os.Executable()
 	exe = filepath.Base(exe)
 	debugEnv := fmt.Sprintf("%s_DEBUG", strings.ToUpper(exe))
+	slog.Info("debug", "env", debugEnv)
 	_, ok := os.LookupEnv(debugEnv)
 	if ok {
 		debug = true
