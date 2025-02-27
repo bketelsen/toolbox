@@ -1,4 +1,4 @@
-module github.com/bketelsen/toolbox
+module github.com/bketelsen/toolbox/ui
 
 go 1.23.4
 
