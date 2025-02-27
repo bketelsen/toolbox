@@ -1,0 +1,36 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  build:
+    cmds:
+      - go build ./...
+    silent: true
+  test:
+    cmds:
+      - go test ./...
+    silent: true
+  format: 
+    cmds:
+      - gofmt -w -s .
+    silent: true
+  vet: 
+    cmds:
+      - go vet ./...
+    silent: true
+  staticcheck: 
+    cmds:
+      - staticcheck ./...
+    silent: true
+  release-snapshot:
+    cmds:
+      - goreleaser release --snapshot --clean
+    silent: true
+  release-check:
+    cmds:
+      - goreleaser check
+    silent: true
