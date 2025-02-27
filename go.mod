@@ -1,10 +1,11 @@
-module github.com/bketelsen/toolbox/ui
+module github.com/bketelsen/toolbox
 
 go 1.23.4
 
 require (
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/fatih/structtag v1.2.0
+	github.com/iancoleman/strcase v0.3.0
 	github.com/jedib0t/go-pretty/v6 v6.6.6
 	github.com/muesli/termenv v0.16.0
 	github.com/stretchr/testify v1.10.0

@@ -3,7 +3,7 @@
 version: '3'
 
 vars:
-  GREETING: Hello, World!
+  VERSION: 0.0.3
 
 tasks:
   build:
@@ -26,6 +26,16 @@ tasks:
     cmds:
       - staticcheck ./...
     silent: true
+  tidy: 
+    cmds:
+      - go mod tidy
+    silent: true
+  libpub:
+    cmds:
+      - git push origin
+      - git tag v{{.VERSION}}
+      - git push --tags
+      - GOPROXY=proxy.golang.org go list -m github.com/bketelsen/toolbox@v{{.VERSION}}
   release-snapshot:
     cmds:
       - goreleaser release --snapshot --clean
