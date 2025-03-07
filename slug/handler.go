@@ -86,7 +86,11 @@ func (h *Handler) Handle(_ context.Context, r slog.Record) error {
 	h.shared.Lock()
 	defer h.shared.Unlock()
 
-	fmt.Fprintf(h.shared, "%s %-5s %s", t, l, internal.Escape(r.Message))
+	if !h.shared.options.DisableTimestamps {
+		fmt.Fprintf(h.shared, "%s %-5s %s", t, l, internal.Escape(r.Message))
+	} else {
+		fmt.Fprintf(h.shared, "%-5s %s", l, internal.Escape(r.Message))
+	}
 
 	prefix := strings.Join(append(h.groups, ""), ".")
 
@@ -212,6 +216,9 @@ type HandlerOptions struct {
 	// TimeFormat for timestamps and [time.Time] attributes. Defaults to
 	// [DefaultTimeFormat] if unset.
 	TimeFormat string
+
+	//DisableTimestamps turns off timestamps
+	DisableTimestamps bool
 }
 
 type shared struct {

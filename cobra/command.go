@@ -27,7 +27,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/bketelsen/toolbox/slug"
 	flag "github.com/spf13/pflag"
@@ -1279,7 +1278,7 @@ func (c *Command) InitDefaultErrLogger() {
 			HandlerOptions: slog.HandlerOptions{
 				Level: loggerLevel,
 			},
-			TimeFormat: time.Kitchen,
+			DisableTimestamps: true,
 		},
 			c.ErrOrStderr(),
 		))
