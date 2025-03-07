@@ -38,7 +38,7 @@ tasks:
       - GOPROXY=proxy.golang.org go list -m github.com/bketelsen/toolbox@v{{.VERSION}}
   release-snapshot:
     cmds:
-      - goreleaser release --snapshot --clean
+      - goreleaser release --snapshot --clean -f ./starter/.goreleaser.yaml
     silent: true
   release-check:
     cmds:
