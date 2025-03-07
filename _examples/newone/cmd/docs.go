@@ -32,7 +32,6 @@ import (
 
 	"github.com/bketelsen/toolbox/cobra"
 	"github.com/bketelsen/toolbox/cobra/doc"
-
 )
 
 // docsCmd represents the docs command
@@ -81,6 +80,7 @@ func init() {
 	// is called directly, e.g.:
 	// docsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
+
 const fmTemplate = `---
 date: %s
 title: "%s"
