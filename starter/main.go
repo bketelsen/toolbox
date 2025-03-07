@@ -22,12 +22,9 @@ THE SOFTWARE.
 package main
 
 import (
-	"fmt"
-
 	"github.com/bketelsen/toolbox/starter/cmd"
 )
 
 func main() {
-	fmt.Println("Executing main")
 	cmd.Execute()
 }
