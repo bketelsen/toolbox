@@ -1274,13 +1274,15 @@ func (c *Command) InitDefaultHelpFlag() {
 func (c *Command) InitDefaultErrLogger() {
 
 	if c.Logger == nil {
-		c.Logger = slog.New(slug.NewHandler(slug.HandlerOptions{
-			HandlerOptions: slog.HandlerOptions{
-				Level: loggerLevel,
+		c.Logger = slog.New(slug.NewHandler(c.ErrOrStderr(), &slug.Options{
+			Level: loggerLevel,
+			ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+				if a.Key == slog.TimeKey && len(groups) == 0 {
+					return slog.Attr{}
+				}
+				return a
 			},
-			DisableTimestamps: true,
 		},
-			c.ErrOrStderr(),
 		))
 	}
 

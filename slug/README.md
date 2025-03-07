@@ -1,5 +1,5 @@
-Fork from https://github.com/dotse/slug
+Fork from https://github.com/lmittmann/tint
 
 MIT License
 
-Copyright (c) 2023 The Swedish Internet Foundation
+Copyright (c) 2023 lmittmann
