@@ -1298,7 +1298,7 @@ func TestValidArgsFuncCmdContext(t *testing.T) {
 	rootCmd.AddCommand(childCmd)
 
 	//nolint:golint,staticcheck // We can safely use a basic type as key in tests.
-	ctx := context.WithValue(context.Background(), "testKey", "123")
+	ctx := context.WithValue(context.Background(), ctxTestKey, "123")
 
 	// Test completing an empty string on the childCmd
 	_, output, err := executeCommandWithContextC(ctx, rootCmd, ShellCompNoDescRequestCmd, "childCmd", "")

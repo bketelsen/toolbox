@@ -2924,12 +2924,16 @@ func TestUnknownFlagShouldReturnSameErrorRegardlessOfArgPosition(t *testing.T) {
 	}
 }
 
+type CtxKey string
+
+const ctxTestKey CtxKey = "testKey"
+
 func TestHelpFuncExecuted(t *testing.T) {
 	helpText := "Long description"
 
 	// Create a context that will be unique, not just the background context
 	//nolint:golint,staticcheck // We can safely use a basic type as key in tests.
-	executionCtx := context.WithValue(context.Background(), "testKey", "123")
+	executionCtx := context.WithValue(context.Background(), ctxTestKey, "123")
 
 	child := &Command{Use: "child", Run: emptyRun}
 	child.SetHelpFunc(func(cmd *Command, args []string) {

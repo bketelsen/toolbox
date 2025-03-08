@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -24,7 +23,7 @@ func getProject() *Project {
 
 func TestGoldenInitCmd(t *testing.T) {
 
-	dir, err := ioutil.TempDir("", "cobra-init")
+	dir, err := os.MkdirTemp("", "cobra-init")
 	if err != nil {
 		t.Fatal(err)
 	}
