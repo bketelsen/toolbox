@@ -1,9 +1,8 @@
 // https://github.com/coder/coder/blob/main/LICENSE
 // Extracted and modified from github.com/coder/coder
-package ui
+package cobra
 
 import (
-	"errors"
 	"time"
 
 	"github.com/muesli/termenv"
@@ -30,6 +29,9 @@ type Styles struct {
 	FocusedPrompt,
 	Fuchsia,
 	Warn,
+	Success,
+	Info,
+	Debug,
 	Wrap lipgloss.Style
 }
 
@@ -45,6 +47,7 @@ var (
 	magenta       = lipgloss.Color("5")
 	brightBlue    = lipgloss.Color("12")
 	brightMagenta = lipgloss.Color("13")
+	cyan          = lipgloss.Color("36")
 )
 
 func isTerm() bool {
@@ -135,15 +138,15 @@ func init() {
 		Warn: lipgloss.NewStyle().
 			Foreground(yellow),
 
+		Success: lipgloss.NewStyle().
+			Foreground(green),
+
+		Info: lipgloss.NewStyle().
+			Foreground(brightBlue),
+		Debug: lipgloss.NewStyle().
+			Foreground(cyan),
+
 		Wrap: lipgloss.NewStyle().
 			Width(80),
 	}
-}
-
-// ValidateNotEmpty is a helper function to disallow empty inputs!
-func ValidateNotEmpty(s string) error {
-	if s == "" {
-		return errors.New("must be provided")
-	}
-	return nil
 }

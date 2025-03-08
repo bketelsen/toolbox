@@ -3,7 +3,7 @@
 version: '3'
 
 vars:
-  VERSION: 0.0.3
+  VERSION: 0.0.4
 
 tasks:
   build:
@@ -38,9 +38,15 @@ tasks:
       - GOPROXY=proxy.golang.org go list -m github.com/bketelsen/toolbox@v{{.VERSION}}
   release-snapshot:
     cmds:
-      - goreleaser release --snapshot --clean
+      - goreleaser release --snapshot --clean -f ./starter/.goreleaser.yaml
     silent: true
   release-check:
     cmds:
       - goreleaser check
+    silent: true
+  goreleaser:
+    cmds:
+      - wget https://github.com/goreleaser/goreleaser-pro/releases/download/v2.7.0-pro/goreleaser-pro_2.7.0_amd64.deb
+      - sudo dpkg -i goreleaser-pro_2.7.0_amd64.deb 
+      - rm goreleaser-pro_2.7.0_amd64.deb 
     silent: true

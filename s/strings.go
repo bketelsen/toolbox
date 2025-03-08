@@ -1,4 +1,4 @@
-package toolbox
+package s
 
 import (
 	"strings"
