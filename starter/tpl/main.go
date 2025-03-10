@@ -52,8 +52,7 @@ import (
 	"os"
 
 	"github.com/bketelsen/toolbox/cobra"
-{{- if .Viper }}
-	"github.com/spf13/viper"{{ end }}
+	{{- if .Viper }}"github.com/spf13/viper"{{ end }}
 )
 
 {{ if .Viper -}}

@@ -1,6 +1,5 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -14,9 +13,8 @@ import (
 	"time"
 
 	"github.com/bketelsen/toolbox/cobra"
-	"github.com/spf13/viper"
 	"github.com/bketelsen/toolbox/cobra/doc"
-
+	"github.com/spf13/viper"
 )
 
 // docsCmd represents the docs command
@@ -69,6 +67,7 @@ func init() {
 	docsCmd.Flags().StringP("basepath", "b", "", "Base path for the documentation (default is /)")
 	viper.BindPFlag("basepath", docsCmd.Flags().Lookup("basepath"))
 }
+
 const fmTemplate = `---
 date: %s
 title: "%s"
