@@ -55,6 +55,13 @@ func isTerm() bool {
 	return color != termenv.Ascii
 }
 
+func DisableColor() {
+	color = termenv.Ascii
+}
+func EnableColor() {
+	color = termenv.ANSI
+}
+
 // Bold returns a formatter that renders text in bold
 // if the terminal supports it.
 func Bold(s string) string {
@@ -99,21 +106,33 @@ func Placeholder(s string) string {
 
 // Wrap prevents the text from overflowing the terminal.
 func Wrap(s string) string {
+	if !isTerm() {
+		return s
+	}
 	return DefaultStyles.Wrap.Render(s)
 }
 
 // Code formats code for display.
 func Code(s string) string {
+	if !isTerm() {
+		return s
+	}
 	return DefaultStyles.Code.Render(s)
 }
 
 // Field formats a field for display.
 func Field(s string) string {
+	if !isTerm() {
+		return s
+	}
 	return DefaultStyles.Field.Render(s)
 }
 
 // KeyValuePair formats a kvp for display.
 func KeyValuePair(key, value string) string {
+	if !isTerm() {
+		return key + ":" + value
+	}
 	k := Field(key)
 	v := Keyword(value)
 	return k + ":" + v

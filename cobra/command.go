@@ -1554,6 +1554,24 @@ func (c *Command) UseLine() string {
 	var useline string
 	use := strings.Replace(c.Use, c.Name(), c.DisplayName(), 1)
 	if c.HasParent() {
+		useline = c.parent.CommandPath() + " " + use
+	} else {
+		useline = use
+	}
+	if c.DisableFlagsInUseLine {
+		return useline
+	}
+	if c.HasAvailableFlags() && !strings.Contains(useline, "[flags]") {
+		useline += " [flags]"
+	}
+	return useline
+}
+
+// UseLine puts out the full usage for a given command (including parents).
+func (c *Command) UseLineTerm() string {
+	var useline string
+	use := strings.Replace(c.Use, c.Name(), c.DisplayName(), 1)
+	if c.HasParent() {
 		useline = Keyword(c.parent.CommandPath()) + " " + Keyword(use)
 	} else {
 		useline = Keyword(use)
@@ -2046,7 +2064,7 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 	c := in.(*Command)
 	fmt.Fprint(w, Title("Usage:"))
 	if c.Runnable() {
-		fmt.Fprintf(w, "\n  %s", c.UseLine())
+		fmt.Fprintf(w, "\n  %s", c.UseLineTerm())
 	}
 	if c.HasAvailableSubCommands() {
 		fmt.Fprintf(w, "\n  %s [command]", Keyword(c.CommandPath()))
