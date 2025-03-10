@@ -1554,9 +1554,9 @@ func (c *Command) UseLine() string {
 	var useline string
 	use := strings.Replace(c.Use, c.Name(), c.DisplayName(), 1)
 	if c.HasParent() {
-		useline = c.parent.CommandPath() + " " + use
+		useline = Keyword(c.parent.CommandPath()) + " " + Keyword(use)
 	} else {
-		useline = use
+		useline = Keyword(use)
 	}
 	if c.DisableFlagsInUseLine {
 		return useline
@@ -2044,28 +2044,28 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 // defaultUsageFunc is equivalent to executing defaultUsageTemplate. The two should be changed in sync.
 func defaultUsageFunc(w io.Writer, in interface{}) error {
 	c := in.(*Command)
-	fmt.Fprint(w, "Usage:")
+	fmt.Fprint(w, Title("Usage:"))
 	if c.Runnable() {
 		fmt.Fprintf(w, "\n  %s", c.UseLine())
 	}
 	if c.HasAvailableSubCommands() {
-		fmt.Fprintf(w, "\n  %s [command]", c.CommandPath())
+		fmt.Fprintf(w, "\n  %s [command]", Keyword(c.CommandPath()))
 	}
 	if len(c.Aliases) > 0 {
-		fmt.Fprintf(w, "\n\nAliases:\n")
+		fmt.Fprintf(w, "\n\n"+Title("Aliases:")+"\n")
 		fmt.Fprintf(w, "  %s", c.NameAndAliases())
 	}
 	if c.HasExample() {
-		fmt.Fprintf(w, "\n\nExamples:\n")
+		fmt.Fprintf(w, "\n\n"+Title("Examples:")+"\n")
 		fmt.Fprintf(w, "%s", c.Example)
 	}
 	if c.HasAvailableSubCommands() {
 		cmds := c.Commands()
 		if len(c.Groups()) == 0 {
-			fmt.Fprintf(w, "\n\nAvailable Commands:")
+			fmt.Fprintf(w, "\n\n"+Title("Available Commands:"))
 			for _, subcmd := range cmds {
 				if subcmd.IsAvailableCommand() || subcmd.Name() == helpCommandName {
-					fmt.Fprintf(w, "\n  %s %s", rpad(subcmd.Name(), subcmd.NamePadding()), subcmd.Short)
+					fmt.Fprintf(w, "\n  %s %s", Keyword(rpad(subcmd.Name(), subcmd.NamePadding())), subcmd.Short)
 				}
 			}
 		} else {
@@ -2073,30 +2073,30 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 				fmt.Fprintf(w, "\n\n%s", group.Title)
 				for _, subcmd := range cmds {
 					if subcmd.GroupID == group.ID && (subcmd.IsAvailableCommand() || subcmd.Name() == helpCommandName) {
-						fmt.Fprintf(w, "\n  %s %s", rpad(subcmd.Name(), subcmd.NamePadding()), subcmd.Short)
+						fmt.Fprintf(w, "\n  %s %s", Keyword(rpad(subcmd.Name(), subcmd.NamePadding())), subcmd.Short)
 					}
 				}
 			}
 			if !c.AllChildCommandsHaveGroup() {
-				fmt.Fprintf(w, "\n\nAdditional Commands:")
+				fmt.Fprintf(w, "\n\n"+Title("Additional Commands:"))
 				for _, subcmd := range cmds {
 					if subcmd.GroupID == "" && (subcmd.IsAvailableCommand() || subcmd.Name() == helpCommandName) {
-						fmt.Fprintf(w, "\n  %s %s", rpad(subcmd.Name(), subcmd.NamePadding()), subcmd.Short)
+						fmt.Fprintf(w, "\n  %s %s", Keyword(rpad(subcmd.Name(), subcmd.NamePadding())), subcmd.Short)
 					}
 				}
 			}
 		}
 	}
 	if c.HasAvailableLocalFlags() {
-		fmt.Fprintf(w, "\n\nFlags:\n")
+		fmt.Fprintf(w, "\n\n"+Title("Flags:")+"\n")
 		fmt.Fprint(w, trimRightSpace(c.LocalFlags().FlagUsages()))
 	}
 	if c.HasAvailableInheritedFlags() {
-		fmt.Fprintf(w, "\n\nGlobal Flags:\n")
+		fmt.Fprintf(w, "\n\n"+Title("Global Flags:")+"\n")
 		fmt.Fprint(w, trimRightSpace(c.InheritedFlags().FlagUsages()))
 	}
 	if c.HasHelpSubCommands() {
-		fmt.Fprintf(w, "\n\nAdditional help topcis:")
+		fmt.Fprintf(w, "\n\n"+Title("Additional help topcis:"))
 		for _, subcmd := range c.Commands() {
 			if subcmd.IsAdditionalHelpTopicCommand() {
 				fmt.Fprintf(w, "\n  %s %s", rpad(subcmd.CommandPath(), subcmd.CommandPathPadding()), subcmd.Short)
@@ -2104,7 +2104,7 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 		}
 	}
 	if c.HasAvailableSubCommands() {
-		fmt.Fprintf(w, "\n\nUse \"%s [command] --help\" for more information about a command.", c.CommandPath())
+		fmt.Fprintf(w, "\n\nUse \"%s [command] --help\" for more information about a command.", Title(c.CommandPath()))
 	}
 	fmt.Fprintln(w)
 	return nil
@@ -2117,6 +2117,10 @@ var defaultHelpTemplate = `{{with (or .Long .Short)}}{{. | trimTrailingWhitespac
 // defaultHelpFunc is equivalent to executing defaultHelpTemplate. The two should be changed in sync.
 func defaultHelpFunc(w io.Writer, in interface{}) error {
 	c := in.(*Command)
+	if c.Version != "" {
+		fmt.Fprintf(w, "%s version %s\n", Title(c.DisplayName()), Keyword(c.Version))
+	}
+
 	usage := c.Long
 	if usage == "" {
 		usage = c.Short
@@ -2138,6 +2142,6 @@ var defaultVersionTemplate = `{{with .DisplayName}}{{printf "%s " .}}{{end}}{{pr
 // defaultVersionFunc is equivalent to executing defaultVersionTemplate. The two should be changed in sync.
 func defaultVersionFunc(w io.Writer, in interface{}) error {
 	c := in.(*Command)
-	_, err := fmt.Fprintf(w, "%s version %s\n", c.DisplayName(), c.Version)
+	_, err := fmt.Fprintf(w, "%s version %s\n", Title(c.DisplayName()), Keyword(c.Version))
 	return err
 }

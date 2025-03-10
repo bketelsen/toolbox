@@ -18,6 +18,7 @@ var (
 )
 
 type Styles struct {
+	Title,
 	Code,
 	DateTimeStamp,
 	Error,
@@ -63,18 +64,36 @@ func Bold(s string) string {
 	return BoldStyle.Render(s)
 }
 
+// Bold returns a formatter that renders text in bold
+// if the terminal supports it.
+func Title(s string) string {
+	if !isTerm() {
+		return s
+	}
+	return DefaultStyles.Info.Render(s)
+}
+
 // Timestamp formats a timestamp for display.
 func Timestamp(t time.Time) string {
+	if !isTerm() {
+		return t.Format(time.Stamp)
+	}
 	return DefaultStyles.DateTimeStamp.Render(t.Format(time.Stamp))
 }
 
 // Keyword formats a keyword for display.
 func Keyword(s string) string {
+	if !isTerm() {
+		return s
+	}
 	return DefaultStyles.Keyword.Render(s)
 }
 
 // Placeholder formats a placeholder for display.
 func Placeholder(s string) string {
+	if !isTerm() {
+		return s
+	}
 	return DefaultStyles.Placeholder.Render(s)
 }
 
@@ -105,6 +124,8 @@ func init() {
 	// Doing so would require a round-trip between the program and the terminal
 	// due to the OSC query and response.
 	DefaultStyles = Styles{
+		Title: lipgloss.NewStyle().
+			Foreground(brightBlue),
 		Code: lipgloss.NewStyle().
 			PaddingLeft(1).
 			PaddingRight(1).

@@ -37,6 +37,7 @@ var templateFuncs = template.FuncMap{
 	"rpad":                    rpad,
 	"gt":                      Gt,
 	"eq":                      Eq,
+	"bold":                    Bold,
 }
 
 var initializers []func()

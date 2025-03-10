@@ -1279,7 +1279,7 @@ func TestValidArgsFuncCmdContext(t *testing.T) {
 
 		if ctx == nil {
 			t.Error("Received nil context in completion func")
-		} else if ctx.Value("testKey") != "123" {
+		} else if ctx.Value(ctxTestKey) != "123" {
 			t.Error("Received invalid context")
 		}
 

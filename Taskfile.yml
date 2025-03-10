@@ -30,6 +30,14 @@ tasks:
     cmds:
       - go mod tidy
     silent: true
+  checks:
+    cmds:
+      - task staticcheck
+      - task vet
+      - task test
+      - task format
+      - task tidy
+    silent: true
   libpub:
     cmds:
       - git push origin
