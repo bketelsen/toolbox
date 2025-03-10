@@ -52,8 +52,7 @@ import (
 	"os"
 
 	"github.com/bketelsen/toolbox/cobra"
-{{- if .Viper }}
-	"github.com/spf13/viper"{{ end }}
+	{{- if .Viper }}"github.com/spf13/viper"{{ end }}
 )
 
 {{ if .Viper -}}
@@ -198,6 +197,7 @@ import (
 	"time"
 
 	"github.com/bketelsen/toolbox/cobra"
+	"github.com/spf13/viper"
 	"github.com/bketelsen/toolbox/cobra/doc"
 
 )
@@ -213,9 +213,11 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.` + "`" + `,
 	Run: func(cmd *cobra.Command, args []string) {
+		bp := viper.GetString("basepath")
+		cmd.Logger.Info("Base path for documentation", "basepath", bp)
 		linkHandler := func(name string) string {
 			base := strings.TrimSuffix(name, path.Ext(name))
-			return "/docs/cli/" + strings.ToLower(base) + "/"
+			return bp + "/docs/cli/" + strings.ToLower(base) + "/"
 		}
 		filePrepender := func(filename string) string {
 			now := time.Now().Format(time.RFC3339)
@@ -247,6 +249,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// {{ .CmdName }}Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	docsCmd.Flags().StringP("basepath", "b", "", "Base path for the documentation (default is /)")
+	viper.BindPFlag("basepath", docsCmd.Flags().Lookup("basepath"))
 }
 const fmTemplate = ` + "`" + `---
 date: %s

@@ -1,23 +1,5 @@
 /*
-Copyright © 2025 Brian
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 */
 package cmd
 
@@ -32,6 +14,7 @@ import (
 
 	"github.com/bketelsen/toolbox/cobra"
 	"github.com/bketelsen/toolbox/cobra/doc"
+	"github.com/spf13/viper"
 )
 
 // docsCmd represents the docs command
@@ -45,9 +28,11 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		bp := viper.GetString("basepath")
+		cmd.Logger.Info("Base path for documentation", "basepath", bp)
 		linkHandler := func(name string) string {
 			base := strings.TrimSuffix(name, path.Ext(name))
-			return "/docs/cli/" + strings.ToLower(base) + "/"
+			return bp + "/docs/cli/" + strings.ToLower(base) + "/"
 		}
 		filePrepender := func(filename string) string {
 			now := time.Now().Format(time.RFC3339)
@@ -79,6 +64,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// docsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	docsCmd.Flags().StringP("basepath", "b", "", "Base path for the documentation (default is /)")
+	viper.BindPFlag("basepath", docsCmd.Flags().Lookup("basepath"))
 }
 
 const fmTemplate = `---

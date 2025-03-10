@@ -1,5 +1,5 @@
 ---
-date: 2025-03-10T16:25:54Z
+date: 2025-03-10T19:43:56Z
 title: "newone completion bash"
 slug: newone_completion_bash
 url: /docs/cli/newone_completion_bash/
