@@ -1,5 +1,5 @@
 ---
-date: 2025-03-10T16:25:54Z
+date: 2025-03-10T19:43:56Z
 title: "newone completion powershell"
 slug: newone_completion_powershell
 url: /docs/cli/newone_completion_powershell/

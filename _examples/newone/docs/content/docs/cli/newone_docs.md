@@ -1,5 +1,5 @@
 ---
-date: 2025-03-10T16:25:54Z
+date: 2025-03-10T19:43:56Z
 title: "newone docs"
 slug: newone_docs
 url: /docs/cli/newone_docs/
@@ -24,8 +24,9 @@ newone docs [flags]
 ### Options
 
 ```
-      --debug   debug output
-  -h, --help    help for docs
+  -b, --basepath string   Base path for the documentation (default is /)
+      --debug             debug output
+  -h, --help              help for docs
 ```
 
 ### Options inherited from parent commands
