@@ -38,7 +38,6 @@ const (
 
 	helpFlagName    = "help"
 	helpCommandName = "help"
-	debugFlagName   = "debug"
 )
 
 var loggerLevel = new(slog.LevelVar)
@@ -234,8 +233,6 @@ type Command struct {
 	commandsMaxCommandPathLen int
 	commandsMaxNameLen        int
 
-	// Debug is a flag to enable debug output.
-	Debug bool
 	// TraverseChildren parses flags on all parents before executing child command.
 	TraverseChildren bool
 
@@ -424,12 +421,8 @@ func (c *Command) SetLogger(logger *slog.Logger) {
 }
 
 // SetLogLevel sets the log level for the command.
-// If Debug is set to true, the log level will be set to Debug
-// and the level parameter will be ignored.
 func (c *Command) SetLogLevel(level slog.Level) {
-	if !c.Debug {
-		loggerLevel.Set(level)
-	}
+	loggerLevel.Set(level)
 }
 
 func (c *Command) getOut(def io.Writer) io.Writer {
@@ -939,9 +932,6 @@ func (c *Command) execute(a []string) (err error) {
 	c.InitDefaultHelpFlag()
 	c.InitDefaultVersionFlag()
 
-	// initialize the debug flag
-	c.InitDefaultDebugFlag()
-
 	err = c.ParseFlags(a)
 	if err != nil {
 		return c.FlagErrorFunc()(c, err)
@@ -959,17 +949,6 @@ func (c *Command) execute(a []string) (err error) {
 
 	if helpVal {
 		return flag.ErrHelp
-	}
-
-	// if the debug flag is set, set the debug flag on the root command
-	debugVal, err := c.Flags().GetBool(debugFlagName)
-	if err != nil {
-		c.Println("\"debug\" flag declared as non-bool. Please correct your code")
-		return err
-	}
-	if debugVal {
-		c.Root().Debug = true
-		loggerLevel.Set(slog.LevelDebug)
 	}
 
 	// initialize the logger after flags are parsed
@@ -1138,7 +1117,6 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 
 	// initialize help at the last point to allow for user overriding
 	c.InitDefaultHelpCmd()
-	c.InitDefaultDebugFlag()
 
 	args := c.args
 
@@ -1315,19 +1293,6 @@ func (c *Command) InitDefaultVersionFlag() {
 	}
 }
 
-// InitDefaultDebugFlag adds default debug flag to c.
-// It is called automatically by executing the c.
-// If c already has a debug flag, it will do nothing.
-func (c *Command) InitDefaultDebugFlag() {
-
-	c.mergePersistentFlags()
-	if c.Flags().Lookup(debugFlagName) == nil {
-		usage := "debug output"
-		c.PersistentFlags().Bool(debugFlagName, false, usage)
-		_ = c.Flags().SetAnnotation(debugFlagName, FlagSetByCobraAnnotation, []string{"true"})
-	}
-}
-
 // InitDefaultHelpCmd adds default help command to c.
 // It is called automatically by executing the c or by calling help and usage.
 // If c already has help command or c has no subcommands, it will do nothing.
@@ -1374,7 +1339,6 @@ Simply type ` + c.DisplayName() + ` help [path to command] for full details.`,
 
 					cmd.InitDefaultHelpFlag()    // make possible 'help' flag to be shown
 					cmd.InitDefaultVersionFlag() // make possible 'version' flag to be shown
-					cmd.InitDefaultDebugFlag()   // make possible 'debug' flag to be shown
 					CheckErr(cmd.Help())
 				}
 			},

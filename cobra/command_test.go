@@ -987,8 +987,7 @@ Flags:
   -h, --help   help for child
 
 Global Flags:
-      --bar     parent bar usage
-      --debug   debug output
+      --bar   parent bar usage
 `
 
 	if got != expected {
@@ -2249,8 +2248,7 @@ func TestFlagErrorFuncHelp(t *testing.T) {
   c [flags]
 
 Flags:
-      --debug   debug output
-      --help    help for c
+      --help   help for c
 `
 	if out != expected {
 		t.Errorf("Expected: %v, got: %v", expected, out)

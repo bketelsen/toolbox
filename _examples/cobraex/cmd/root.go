@@ -53,7 +53,6 @@ to quickly create a Cobra application.`,
 		cmd.Logger.Debug("Debug message 2 -- won't show without --debug flag")
 		cmd.Logger.Info("Info message, always shows")
 		cmd.SetLogLevel(slog.LevelDebug)
-		cmd.Logger.Debug("Debug message 3 should show", "debug", cmd.Debug)
 
 		action := func() {
 			time.Sleep(1 * time.Second)
