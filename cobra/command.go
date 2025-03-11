@@ -1138,6 +1138,7 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 
 	// initialize help at the last point to allow for user overriding
 	c.InitDefaultHelpCmd()
+	c.InitDefaultDebugFlag()
 
 	args := c.args
 
@@ -1322,7 +1323,7 @@ func (c *Command) InitDefaultDebugFlag() {
 	c.mergePersistentFlags()
 	if c.Flags().Lookup(debugFlagName) == nil {
 		usage := "debug output"
-		c.Flags().Bool(debugFlagName, false, usage)
+		c.PersistentFlags().Bool(debugFlagName, false, usage)
 		_ = c.Flags().SetAnnotation(debugFlagName, FlagSetByCobraAnnotation, []string{"true"})
 	}
 }

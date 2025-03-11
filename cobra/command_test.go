@@ -982,13 +982,13 @@ func TestHelpCommandExecutedOnChildWithFlagThatShadowsParentFlag(t *testing.T) {
   parent child [flags]
 
 Flags:
-      --baz     child baz usage
-      --debug   debug output
-      --foo     child foo usage
-  -h, --help    help for child
+      --baz    child baz usage
+      --foo    child foo usage
+  -h, --help   help for child
 
 Global Flags:
-      --bar   parent bar usage
+      --bar     parent bar usage
+      --debug   debug output
 `
 
 	if got != expected {
