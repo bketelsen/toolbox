@@ -69,10 +69,40 @@ Cobra init must be run inside of a go module (please run "go mod init <MODNAME>"
 			if viper.GetBool("useViper") {
 				cobra.CheckErr(goGet("github.com/spf13/viper"))
 			}
+
+			// generate docs if requested
+			if viper.GetBool("docs") {
+				cmd.Logger.Info("creating docs command")
+				err = doDocs(cmd)
+				if err != nil {
+					cmd.Logger.Error(err.Error())
+					cobra.CheckErr(err)
+				}
+				fmt.Printf("%s created in %s\n", "docs", projectPath)
+
+			}
+			// generate extras if requested
+			if viper.GetBool("extras") {
+				cmd.Logger.Info("creating extras")
+				err = doExtras(cmd)
+				if err != nil {
+					cmd.Logger.Error(err.Error())
+					cobra.CheckErr(err)
+				}
+				fmt.Printf("Extras created in %s\n", projectPath)
+			}
 			fmt.Printf("Your Cobra application is ready at\n%s\n", projectPath)
 		},
 	}
 )
+
+func init() {
+	initCmd.Flags().BoolP("docs", "d", true, "generate documentation")
+	viper.BindPFlag("docs", initCmd.Flags().Lookup("docs"))
+	initCmd.Flags().BoolP("extras", "e", true, "generate extra configs")
+	viper.BindPFlag("extras", initCmd.Flags().Lookup("extras"))
+
+}
 
 func initializeProject(args []string) (string, error) {
 	wd, err := os.Getwd()
@@ -134,6 +164,7 @@ func parseModInfo() (Mod, CurDir) {
 
 type Mod struct {
 	Path, Dir, GoMod string
+	Main             bool
 }
 
 type CurDir struct {

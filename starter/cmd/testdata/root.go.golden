@@ -25,10 +25,26 @@ import (
 )
 
 var cfgFile string
+var version string
+var commit string
+
+func versionString() string {
+	if len(commit) > 7 {
+		commit = commit[:7]
+	}
+	if len(commit) == 0 {
+		commit = "unknown"
+	}
+	if len(version) == 0 {
+		version = "unknown"
+	}
+	return fmt.Sprintf("%s (%s)", version, commit)
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cmd",
+	Version: versionString(),
 	Short: "A brief description of your application",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:

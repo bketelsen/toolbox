@@ -23,6 +23,33 @@ var DocFS embed.FS
 //go:embed go.mod.tpl
 var GoModTemplate []byte
 
+//go:embed go.yml.tpl
+var GoActionTemplate []byte
+
+//go:embed Taskfile.yml.tpl
+var TaskfileTemplate []byte
+
+//go:embed docsTaskfile.yml.tpl
+var DocsTaskfileTemplate []byte
+
+//go:embed .goreleaser.yaml.tpl
+var GoReleaserTemplate []byte
+
+//go:embed pages.yml.tpl
+var ActionsPagesTemplate []byte
+
+//go:embed release.yml.tpl
+var ActionsReleaseTemplate []byte
+
+//go:embed devcontainer.json.tpl
+var DevContainerTemplate []byte
+
+//go:embed Dockerfile.tpl
+var DockerfileTemplate []byte
+
+//go:embed gitignore.tpl
+var GitIgnoreTemplate []byte
+
 func MainTemplate() []byte {
 	return []byte(`/*
 {{ .Copyright }}
@@ -58,10 +85,26 @@ import (
 {{ if .Viper -}}
 var cfgFile string
 {{- end }}
+var version string
+var commit string
+
+func versionString() string {
+	if len(commit) > 7 {
+		commit = commit[:7]
+	}
+	if len(commit) == 0 {
+		commit = "unknown"
+	}
+	if len(version) == 0 {
+		version = "unknown"
+	}
+	return fmt.Sprintf("%s (%s)", version, commit)
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "{{ .AppName }}",
+	Version: versionString(),
 	Short: "A brief description of your application",
 	Long: ` + "`" + `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
@@ -197,8 +240,8 @@ import (
 	"time"
 
 	"github.com/bketelsen/toolbox/cobra"
-	"github.com/spf13/viper"
 	"github.com/bketelsen/toolbox/cobra/doc"
+	"github.com/spf13/viper"
 
 )
 
@@ -249,7 +292,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// {{ .CmdName }}Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	docsCmd.Flags().StringP("basepath", "b", "", "Base path for the documentation (default is /)")
+	docsCmd.Flags().StringP("basepath", "b", "{{ .AppName }}", "Base path for the documentation (default is /{{ .AppName }})")
 	viper.BindPFlag("basepath", docsCmd.Flags().Lookup("basepath"))
 }
 const fmTemplate = ` + "`" + `---
@@ -259,4 +302,13 @@ slug: %s
 url: %s
 ---
 ` + "`")
+}
+
+func TaskSummaryTemplate() []byte {
+	return []byte(`
+## Available Tasks
+{{ range .Summary.Tasks }}
+- {{ .Name }}: {{  .Desc }} 
+{{ end }}
+`)
 }

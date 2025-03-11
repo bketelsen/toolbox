@@ -19,12 +19,172 @@ type Project struct {
 	Legal        License
 	Viper        bool
 	AppName      string
+	Summary      *TaskSummary
 }
 
 type Command struct {
 	CmdName   string
 	CmdParent string
 	*Project
+}
+
+type Extras struct {
+	Taskfile       bool
+	GoReleaser     bool
+	DevContainer   bool
+	ActionsGo      bool
+	ActionsPages   bool
+	ActionsRelease bool
+	Overwrite      bool
+	*Project
+}
+
+func (e *Extras) Create() error {
+	if e.Taskfile {
+		tf := fmt.Sprintf("%s/Taskfile.yml", e.AbsolutePath)
+		if exists(tf) && !e.Overwrite {
+			return fmt.Errorf("found existing Taskfile.yml, use -o to overwrite")
+		}
+		taskfile, err := os.Create(tf)
+		if err != nil {
+			return err
+		}
+		defer taskfile.Close()
+		// change the delimiters to [[ and ]]
+		// this is because the template uses {{ and }} for the template
+		taskfileTemplate := template.Must(template.New("taskfile").
+			Delims("[[", "]]").
+			Parse(string(tpl.TaskfileTemplate)))
+		err = taskfileTemplate.Execute(taskfile, e)
+		if err != nil {
+			return err
+		}
+		summary, err := getTaskSummary(e.AbsolutePath)
+		if err != nil {
+			return err
+		}
+		e.Summary = &summary
+		summaryFile, err := os.Create(fmt.Sprintf("%s/TASKS.md", e.AbsolutePath))
+		if err != nil {
+			return err
+		}
+		defer summaryFile.Close()
+		summaryTemplate := template.Must(template.New("summary").
+			Parse(string(tpl.TaskSummaryTemplate())))
+		err = summaryTemplate.Execute(summaryFile, e)
+		if err != nil {
+			return err
+		}
+
+	}
+	if e.GoReleaser {
+		rf := fmt.Sprintf("%s/.goreleaser.yml", e.AbsolutePath)
+		if exists(rf) && !e.Overwrite {
+			return fmt.Errorf("found existing .goreleaser.yml, use -o to overwrite")
+		}
+		goReleaser, err := os.Create(rf)
+		if err != nil {
+			return err
+		}
+		defer goReleaser.Close()
+		goReleaserTemplate := template.Must(template.New("goreleaser").
+			Delims("[[", "]]").
+			Parse(string(tpl.GoReleaserTemplate)))
+		err = goReleaserTemplate.Execute(goReleaser, e)
+		if err != nil {
+			return err
+		}
+	}
+	if e.DevContainer {
+		dc := fmt.Sprintf("%s/.devcontainer/devcontainer.json", e.AbsolutePath)
+		if exists(dc) && !e.Overwrite {
+			return fmt.Errorf("found existing .devcontainer/devcontainer.json file, use -o to overwrite")
+		}
+		if err := os.MkdirAll(fmt.Sprintf("%s/.devcontainer", e.AbsolutePath), 0755); err != nil {
+			return err
+		}
+		devContainer, err := os.Create(dc)
+		if err != nil {
+			return err
+		}
+		defer devContainer.Close()
+		devContainerTemplate := template.Must(template.New("devcontainer").Parse(string(tpl.DevContainerTemplate)))
+		err = devContainerTemplate.Execute(devContainer, e)
+		if err != nil {
+			return err
+		}
+		dockerfile, err := os.Create(fmt.Sprintf("%s/.devcontainer/Dockerfile", e.AbsolutePath))
+		if err != nil {
+			return err
+		}
+		defer dockerfile.Close()
+		dockerfileTemplate := template.Must(template.New("dockerfile").Parse(string(tpl.DockerfileTemplate)))
+		err = dockerfileTemplate.Execute(dockerfile, e)
+		if err != nil {
+			return err
+		}
+
+	}
+	if e.ActionsGo || e.ActionsPages || e.ActionsRelease {
+		if err := os.MkdirAll(fmt.Sprintf("%s/.github/workflows", e.AbsolutePath), 0755); err != nil {
+			return err
+		}
+	}
+	if e.ActionsGo {
+		goyml := fmt.Sprintf("%s/.github/workflows/go.yml", e.AbsolutePath)
+		if exists(goyml) && !e.Overwrite {
+			return fmt.Errorf("found existing go workflow file, use -o to overwrite")
+		}
+		actionsGo, err := os.Create(goyml)
+		if err != nil {
+			return err
+		}
+		defer actionsGo.Close()
+		actionsGoTemplate := template.Must(template.New("actionsgo").
+			Delims("[[", "]]").
+			Parse(string(tpl.GoActionTemplate)))
+		err = actionsGoTemplate.Execute(actionsGo, e)
+		if err != nil {
+			return err
+		}
+	}
+	if e.ActionsPages {
+		pagesYml := fmt.Sprintf("%s/.github/workflows/pages.yml", e.AbsolutePath)
+		if exists(pagesYml) && !e.Overwrite {
+			return fmt.Errorf("found existing pages workflow file, use -o to overwrite")
+		}
+		actionsPages, err := os.Create(pagesYml)
+		if err != nil {
+			return err
+		}
+		defer actionsPages.Close()
+		actionsPagesTemplate := template.Must(template.New("actionspages").
+			Delims("[[", "]]").
+			Parse(string(tpl.ActionsPagesTemplate)))
+		err = actionsPagesTemplate.Execute(actionsPages, e)
+		if err != nil {
+			return err
+		}
+	}
+	if e.ActionsRelease {
+		releaseYml := fmt.Sprintf("%s/.github/workflows/release.yml", e.AbsolutePath)
+		if exists(releaseYml) && !e.Overwrite {
+			return fmt.Errorf("found existing release workflow file, use -o to overwrite")
+		}
+		actionsRelease, err := os.Create(fmt.Sprintf("%s/.github/workflows/release.yml", e.AbsolutePath))
+		if err != nil {
+			return err
+		}
+		defer actionsRelease.Close()
+		actionsReleaseTemplate := template.Must(template.New("actionsrelease").
+			Delims("[[", "]]").
+			Parse(string(tpl.ActionsReleaseTemplate)))
+		err = actionsReleaseTemplate.Execute(actionsRelease, e)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (p *Project) Create() error {
@@ -61,6 +221,17 @@ func (p *Project) Create() error {
 
 	rootTemplate := template.Must(template.New("root").Parse(string(tpl.RootTemplate())))
 	err = rootTemplate.Execute(rootFile, p)
+	if err != nil {
+		return err
+	}
+
+	gitIgnore, err := os.Create(fmt.Sprintf("%s/.gitignore", p.AbsolutePath))
+	if err != nil {
+		return err
+	}
+	defer gitIgnore.Close()
+	gitIgnoreTemplate := template.Must(template.New("gitignore").Parse(string(tpl.GitIgnoreTemplate)))
+	err = gitIgnoreTemplate.Execute(gitIgnore, p)
 	if err != nil {
 		return err
 	}
@@ -113,7 +284,6 @@ func (c *Command) Docs() error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("path=%q, isDir=%v\n", path, d.IsDir())
 		os.CopyFS(".", tpl.DocFS)
 		return nil
 	})
@@ -127,6 +297,17 @@ func (c *Command) Docs() error {
 	defer modFile.Close()
 	docModTemplate := template.Must(template.New("docmod").Parse(string(tpl.GoModTemplate)))
 	err = docModTemplate.Execute(modFile, c)
+	if err != nil {
+		return err
+	}
+
+	docsTask, err := os.Create(fmt.Sprintf("%s/docs/Taskfile.yml", c.AbsolutePath))
+	if err != nil {
+		return err
+	}
+	defer docsTask.Close()
+	docsTaskTemplate := template.Must(template.New("docstask").Parse(string(tpl.DocsTaskfileTemplate)))
+	err = docsTaskTemplate.Execute(docsTask, c)
 	if err != nil {
 		return err
 	}

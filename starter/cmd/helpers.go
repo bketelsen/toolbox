@@ -14,6 +14,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -53,4 +54,48 @@ func init() {
 	for _, goPath := range goPaths {
 		srcPaths = append(srcPaths, filepath.Join(goPath, "src"))
 	}
+}
+
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	if err != nil {
+		cobra.CheckErr(err)
+	}
+	return true
+}
+
+type TaskSummary struct {
+	Tasks []struct {
+		Name     string `json:"name,omitempty"`
+		Desc     string `json:"desc,omitempty"`
+		Summary  string `json:"summary,omitempty"`
+		Aliases  []any  `json:"aliases,omitempty"`
+		UpToDate bool   `json:"up_to_date,omitempty"`
+		Location struct {
+			Line     int    `json:"line,omitempty"`
+			Column   int    `json:"column,omitempty"`
+			Taskfile string `json:"taskfile,omitempty"`
+		} `json:"location,omitempty"`
+	} `json:"tasks,omitempty"`
+	Location string `json:"location,omitempty"`
+}
+
+// getTaskSummary returns a TaskSummary struct from the Taskfile.yml
+func getTaskSummary(path string) (TaskSummary, error) {
+	var taskSummary TaskSummary
+	taskfile := filepath.Join(path, "Taskfile.yml")
+	if !exists(taskfile) {
+		cobra.CheckErr("Taskfile.yml not found")
+	}
+	out, err := exec.Command("task", "--list-all", "--json").Output()
+	if err != nil {
+		return taskSummary, err
+	}
+
+	err = json.Unmarshal(out, &taskSummary)
+
+	return taskSummary, err
 }
