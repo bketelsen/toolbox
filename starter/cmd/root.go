@@ -34,15 +34,31 @@ var (
 	// Used for flags.
 	cfgFile     string
 	userLicense string
+	version     string
+	commit      string
 
 	rootCmd = &cobra.Command{
-		Use:   "starter",
-		Short: "A generator for Cobra based Applications",
+		Use:     "starter",
+		Version: versionString(),
+		Short:   "A generator for Cobra based Applications",
 		Long: `Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	}
 )
+
+func versionString() string {
+	if len(commit) > 7 {
+		commit = commit[:7]
+	}
+	if len(commit) == 0 {
+		commit = "unknown"
+	}
+	if len(version) == 0 {
+		version = "unknown"
+	}
+	return fmt.Sprintf("%s (%s)", version, commit)
+}
 
 // Execute executes the root command.
 func Execute() error {
@@ -67,6 +83,7 @@ func init() {
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(docsCmd)
+	rootCmd.AddCommand(extrasCmd)
 }
 
 func initConfig() {

@@ -2,28 +2,28 @@
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 
 version: 2
-project_name: starter
+project_name: newone 
 before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
-
+after:
+  hooks:
+    - go run main.go docs
 builds:
   - env:
       - CGO_ENABLED=0
     goos:
       - linux
-      - darwin
-      - windows
     goarch:
       - amd64
       - arm64
-    binary: starter
-    id: starter
-    main: ./starter/main.go
+    binary: newone 
+    id: newone 
+    # Default: '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser'.
+    # Templates: allowed.
     ldflags:
-      - '-s -w -X github.com/bketelsen/toolbox/starter/cmd.version={{.Version}} -X github.com/bketelsen/toolbox/starter/cmd.commit={{.Commit}}'
-
+      - '-s -w -X newone/cmd.version={{.Version}} -X newone/cmd.commit={{.Commit}}'
 
 archives:
   - formats: [ 'tar.gz' ]
@@ -53,4 +53,3 @@ release:
     ---
 
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
-

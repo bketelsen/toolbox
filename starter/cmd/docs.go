@@ -14,8 +14,8 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
+	"path"
 
 	cobra "github.com/bketelsen/toolbox/cobra"
 )
@@ -29,25 +29,9 @@ var (
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			wd, err := os.Getwd()
-			cobra.CheckErr(err)
-			modName := getModImportPath()
+			cmd.Logger.Info("creating docs command")
+			cobra.CheckErr(doDocs(cmd))
 
-			commandName := "docs"
-			command := &Command{
-				CmdName:   commandName,
-				CmdParent: parentName,
-				Project: &Project{
-					PkgName:      modName,
-					AbsolutePath: wd,
-					Legal:        getLicense(),
-					Copyright:    copyrightLine(),
-				},
-			}
-
-			cobra.CheckErr(command.Docs())
-
-			fmt.Printf("%s created at %s\n", command.CmdName, command.AbsolutePath)
 		},
 	}
 )
@@ -55,5 +39,26 @@ var (
 func init() {
 	docsCmd.Flags().StringVarP(&packageName, "package", "t", "", "target package name (e.g. github.com/spf13/hugo)")
 	docsCmd.Flags().StringVarP(&parentName, "parent", "p", "rootCmd", "variable name of parent command for this command")
-	cobra.CheckErr(addCmd.Flags().MarkDeprecated("package", "this operation has been removed."))
+	cobra.CheckErr(docsCmd.Flags().MarkDeprecated("package", "this operation has been removed."))
+}
+
+func doDocs(_ *cobra.Command) error {
+	wd, err := os.Getwd()
+	cobra.CheckErr(err)
+	modName := getModImportPath()
+
+	commandName := "docs"
+	command := &Command{
+		CmdName:   commandName,
+		CmdParent: parentName,
+		Project: &Project{
+			PkgName:      modName,
+			AbsolutePath: wd,
+			Legal:        getLicense(),
+			Copyright:    copyrightLine(),
+			AppName:      path.Base(modName),
+		},
+	}
+
+	return command.Docs()
 }

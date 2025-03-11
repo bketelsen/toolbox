@@ -1,0 +1,111 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  VERSION: 0.0.1
+
+includes:
+  docs:
+    taskfile: ./docs/Taskfile.yml
+    optional: true
+    dir: ./docs
+
+tasks:
+  build:
+    desc: Build the application
+    cmds:
+      - go build -o [[ .AppName ]] -ldflags '-s -w -X [[ .PkgName ]]/cmd.version={{.VERSION}}-dev' main.go
+    silent: true
+
+  test:
+    desc: Run all tests
+    cmds:
+      - go test ./...
+    silent: true
+
+  format:
+    desc: Format all Go source
+    cmds:
+      - gofmt -w -s .
+    silent: true
+
+  vet:
+    desc: Run go vet on sources   
+    cmds:
+      - go vet ./...
+    silent: true
+
+  staticcheck:
+    desc: Run go staticcheck
+    cmds:
+      - staticcheck ./...
+    silent: true
+
+  tidy:
+    desc: Run go mod tidy 
+    cmds:
+      - go mod tidy
+    silent: true
+
+  checks:
+    desc: Run all go checks
+    cmds:
+      - task staticcheck
+      - task vet
+      - task test
+      - task format
+      - task tidy
+    silent: true
+
+  tools:
+    desc: Install required tools
+    cmds:
+      - go install github.com/bketelsen/toolbox/starter@latest
+
+  snapshot:
+    desc: Run goreleaser in snapshot mode
+    cmds:
+      - goreleaser release --snapshot --clean
+    silent: true
+
+  release-check:
+    desc: Run goreleaser check
+    cmds:
+      - goreleaser check
+    silent: true
+
+  publish:
+    desc: Push and tag at {{.VERSION}}
+    cmds:
+      - git push origin
+      - git tag v{{.VERSION}}
+      - git push --tags
+
+  direnv:
+    desc: Add direnv hook to your bashrc
+    cmds:
+      - direnv hook bash >> ~/.bashrc
+    silent: true
+
+  goreleaser:
+    desc: Install goreleaser on debian derivatives
+    cmds:
+      - wget https://github.com/goreleaser/goreleaser-pro/releases/download/v2.7.0-pro/goreleaser-pro_2.7.0_amd64.deb
+      - sudo dpkg -i goreleaser-pro_2.7.0_amd64.deb
+      - rm goreleaser-pro_2.7.0_amd64.deb
+    silent: true
+
+  generate:
+    desc: Generate CLI documentation
+    deps: [tools]
+    cmds:
+      - go run main.go docs -b "/[[ .AppName ]]"
+    silent: true
+
+  site:
+    desc: Run hugo dev server
+    deps: [build, generate]
+    dir: docs
+    cmds:
+      - hugo server --buildDrafts --disableFastRender
