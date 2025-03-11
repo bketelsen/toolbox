@@ -982,10 +982,9 @@ func TestHelpCommandExecutedOnChildWithFlagThatShadowsParentFlag(t *testing.T) {
   parent child [flags]
 
 Flags:
-      --baz     child baz usage
-      --debug   debug output
-      --foo     child foo usage
-  -h, --help    help for child
+      --baz    child baz usage
+      --foo    child foo usage
+  -h, --help   help for child
 
 Global Flags:
       --bar   parent bar usage
@@ -2249,8 +2248,7 @@ func TestFlagErrorFuncHelp(t *testing.T) {
   c [flags]
 
 Flags:
-      --debug   debug output
-      --help    help for c
+      --help   help for c
 `
 	if out != expected {
 		t.Errorf("Expected: %v, got: %v", expected, out)
