@@ -18,28 +18,29 @@ import (
 )
 
 var (
-	installerCmd = &cobra.Command{
-		Use:   "installer",
-		Short: "Add an installer to your project",
-		Long: `Installer (starter installer) adds a GitHub downloader script to your project.
-		
+	releaserCmd = &cobra.Command{
+		Use:   "releaser",
+		Short: "Add a GoReleaser configuration to your project",
+		Long: `Releaser (starter releaser) adds GoReleaser configuration to your project.
+
 Included:
-* Installer script - GitHub download/install script for your project`,
+* GoReleaser - release automation
+* GitHub Actions for Release - GitHub Release automation for GoReleaser`,
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := doExtras(cmd, false, false, false, false, false, false, true, overwrite)
+			err := doExtras(cmd, false, true, false, false, false, true, false, overwrite)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
 				cobra.CheckErr(err)
 			}
 
-			cmd.Logger.Info("installer created")
+			cmd.Logger.Info("GoReleaser configuration created")
 		},
 	}
 )
 
 func init() {
-	installerCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Overwrite existing files")
+	releaserCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Overwrite existing files")
 
 }

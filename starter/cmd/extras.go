@@ -25,12 +25,21 @@ var (
 	overwrite bool
 	extrasCmd = &cobra.Command{
 		Use:   "extras",
-		Short: "Add extras to your project",
-		Long:  `Extras (starter extras) adds additional functionality to your project.`,
+		Short: "Add all the extras to your project",
+		Long: `Extras (starter extras) adds additional functionality to your project.
+
+Included:
+* Taskfile - automated task runner
+* GoReleaser - release automation
+* DevContainer - VSCode devcontainer
+* GitHub Actions for Go - CI/CD
+* GitHub Actions for Pages - GitHub Pages deployment
+* GitHub Actions for Release - GitHub Release automation for GoReleaser
+* Installer script - GitHub download/install script for your project`,
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := doExtras(cmd)
+			err := doExtras(cmd, true, true, true, true, true, true, true, overwrite)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
 				cobra.CheckErr(err)
@@ -46,7 +55,16 @@ func init() {
 
 }
 
-func doExtras(_ *cobra.Command) error {
+func doExtras(_ *cobra.Command,
+	taskfile bool,
+	releaser bool,
+	devcontainer bool,
+	actionsGo bool,
+	actionsPages bool,
+	actionsRelease bool,
+	installer bool,
+	replace bool,
+) error {
 	wd, err := os.Getwd()
 	if err != nil {
 		return err
@@ -58,14 +76,14 @@ func doExtras(_ *cobra.Command) error {
 	owner, repo := getOwnerRepo(repository)
 
 	extras := &Extras{
-		Taskfile:       true,
-		GoReleaser:     true,
-		DevContainer:   true,
-		ActionsGo:      true,
-		ActionsPages:   true,
-		ActionsRelease: true,
-		Installer:      true,
-		Overwrite:      overwrite,
+		Taskfile:       taskfile,
+		GoReleaser:     releaser,
+		DevContainer:   devcontainer,
+		ActionsGo:      actionsGo,
+		ActionsPages:   actionsPages,
+		ActionsRelease: actionsRelease,
+		Installer:      installer,
+		Overwrite:      replace,
 		Project: &Project{
 			PkgName:      modName,
 			AbsolutePath: wd,

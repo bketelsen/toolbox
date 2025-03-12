@@ -18,28 +18,25 @@ import (
 )
 
 var (
-	installerCmd = &cobra.Command{
-		Use:   "installer",
-		Short: "Add an installer to your project",
-		Long: `Installer (starter installer) adds a GitHub downloader script to your project.
-		
-Included:
-* Installer script - GitHub download/install script for your project`,
+	taskfileCmd = &cobra.Command{
+		Use:   "taskfile",
+		Short: "Add a Taskfile template to your project",
+		Long:  `Taskfile (starter taskfile) adds a Taskfile to your project.`,
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := doExtras(cmd, false, false, false, false, false, false, true, overwrite)
+			err := doExtras(cmd, true, false, false, false, false, false, false, overwrite)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
 				cobra.CheckErr(err)
 			}
 
-			cmd.Logger.Info("installer created")
+			cmd.Logger.Info("Taskfile.yml created")
 		},
 	}
 )
 
 func init() {
-	installerCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Overwrite existing files")
+	taskfileCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Overwrite existing files")
 
 }
