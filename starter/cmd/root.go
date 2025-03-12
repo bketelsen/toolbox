@@ -90,6 +90,7 @@ func init() {
 	rootCmd.AddCommand(extrasCmd)
 	rootCmd.AddCommand(installerCmd)
 	rootCmd.AddCommand(taskfileCmd)
+	rootCmd.AddCommand(releaserCmd)
 }
 
 func initConfig() {
