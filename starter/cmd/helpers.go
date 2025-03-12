@@ -67,6 +67,17 @@ func exists(path string) bool {
 	return true
 }
 
+// given a github URL, return the owner and repo
+func getOwnerRepo(githubURL string) (string, string) {
+	parts := strings.Split(githubURL, "/")
+	if len(parts) < 5 {
+		cobra.CheckErr("Invalid github URL")
+	}
+	owner := parts[3]
+	repo := parts[4]
+	return owner, repo
+}
+
 type TaskSummary struct {
 	Tasks []struct {
 		Name     string `json:"name,omitempty"`
