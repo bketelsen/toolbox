@@ -84,7 +84,7 @@ Cobra init must be run inside of a go module (please run "go mod init <MODNAME>"
 			// generate extras if requested
 			if viper.GetBool("extras") {
 				cmd.Logger.Info("creating extras")
-				err = doExtras(cmd)
+				err = doExtras(cmd, true, true, true, true, true, true, true, false)
 				if err != nil {
 					cmd.Logger.Error(err.Error())
 					cobra.CheckErr(err)
