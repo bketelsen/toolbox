@@ -14,11 +14,7 @@
 package cmd
 
 import (
-	"os"
-	"path/filepath"
-
 	cobra "github.com/bketelsen/toolbox/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -29,13 +25,13 @@ var (
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := doTaskfile(cmd)
+			err := doExtras(cmd, true, false, false, false, false, false, false, overwrite)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
 				cobra.CheckErr(err)
 			}
 
-			cmd.Logger.Info("installer created")
+			cmd.Logger.Info("Taskfile.yml created")
 		},
 	}
 )
@@ -43,36 +39,4 @@ var (
 func init() {
 	taskfileCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Overwrite existing files")
 
-}
-
-func doTaskfile(_ *cobra.Command) error {
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	modName := getModImportPath()
-	binName := filepath.Base(modName)
-	repository := viper.GetString("repository")
-	owner, repo := getOwnerRepo(repository)
-
-	extras := &Extras{
-		Taskfile:       true,
-		GoReleaser:     false,
-		DevContainer:   false,
-		ActionsGo:      false,
-		ActionsPages:   false,
-		ActionsRelease: false,
-		Installer:      false,
-		Overwrite:      overwrite,
-		Project: &Project{
-			PkgName:      modName,
-			AbsolutePath: wd,
-			AppName:      binName,
-			Repository:   repository,
-			Owner:        owner,
-			Repo:         repo,
-		},
-	}
-	return extras.Create()
 }
