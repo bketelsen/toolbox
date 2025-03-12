@@ -22,31 +22,30 @@ import (
 )
 
 var (
-	overwrite bool
-	extrasCmd = &cobra.Command{
-		Use:   "extras",
-		Short: "Add extras to your project",
-		Long:  `Extras (starter extras) adds additional functionality to your project.`,
+	installerCmd = &cobra.Command{
+		Use:   "installer",
+		Short: "Add an installer to your project",
+		Long:  `Installer (starter installer) adds a GitHub downloader script to your project.`,
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := doExtras(cmd)
+			err := doInstaller(cmd)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
 				cobra.CheckErr(err)
 			}
 
-			cmd.Logger.Info("extras added")
+			cmd.Logger.Info("installer created")
 		},
 	}
 )
 
 func init() {
-	extrasCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Overwrite existing files")
+	installerCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Overwrite existing files")
 
 }
 
-func doExtras(_ *cobra.Command) error {
+func doInstaller(_ *cobra.Command) error {
 	wd, err := os.Getwd()
 	if err != nil {
 		return err
@@ -58,12 +57,12 @@ func doExtras(_ *cobra.Command) error {
 	owner, repo := getOwnerRepo(repository)
 
 	extras := &Extras{
-		Taskfile:       true,
-		GoReleaser:     true,
-		DevContainer:   true,
-		ActionsGo:      true,
-		ActionsPages:   true,
-		ActionsRelease: true,
+		Taskfile:       false,
+		GoReleaser:     false,
+		DevContainer:   false,
+		ActionsGo:      false,
+		ActionsPages:   false,
+		ActionsRelease: false,
 		Installer:      true,
 		Overwrite:      overwrite,
 		Project: &Project{

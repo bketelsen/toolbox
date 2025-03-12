@@ -74,16 +74,21 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.starter.yaml)")
 	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
+	rootCmd.PersistentFlags().StringP("repository", "r", "https://github.com/your/project", "gitHub repository URL")
+
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
 	rootCmd.PersistentFlags().Bool("viper", false, "use Viper for configuration")
 	cobra.CheckErr(viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author")))
+	cobra.CheckErr(viper.BindPFlag("repository", rootCmd.PersistentFlags().Lookup("repository")))
 	cobra.CheckErr(viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper")))
 	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
 	viper.SetDefault("license", "none")
+	viper.SetDefault("repository", "https://github.com/your/project")
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(docsCmd)
 	rootCmd.AddCommand(extrasCmd)
+	rootCmd.AddCommand(installerCmd)
 }
 
 func initConfig() {

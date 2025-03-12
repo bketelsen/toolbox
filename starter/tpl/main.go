@@ -50,6 +50,9 @@ var DockerfileTemplate []byte
 //go:embed gitignore.tpl
 var GitIgnoreTemplate []byte
 
+//go:embed install.sh.tpl
+var InstallScriptTemplate []byte
+
 func MainTemplate() []byte {
 	return []byte(`/*
 {{ .Copyright }}

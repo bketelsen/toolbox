@@ -13,7 +13,13 @@ import (
 // Project contains name, license and paths to projects.
 type Project struct {
 	// v2
-	PkgName      string
+	PkgName string
+	// Repository is the full URL of the repository
+	Repository string
+	// Owner is the owner of the repository
+	Owner string
+	// Repo is the name of the repository
+	Repo         string
 	Copyright    string
 	AbsolutePath string
 	Legal        License
@@ -30,6 +36,7 @@ type Command struct {
 
 type Extras struct {
 	Taskfile       bool
+	Installer      bool
 	GoReleaser     bool
 	DevContainer   bool
 	ActionsGo      bool
@@ -40,6 +47,31 @@ type Extras struct {
 }
 
 func (e *Extras) Create() error {
+	if e.Installer {
+		tf := fmt.Sprintf("%s/install.sh", e.AbsolutePath)
+		if exists(tf) && !e.Overwrite {
+			return fmt.Errorf("found existing install.sh, use -o to overwrite")
+		}
+		installer, err := os.Create(tf)
+		if err != nil {
+			return err
+		}
+		defer installer.Close()
+		// change the delimiters to [[ and ]]
+		// this is because the template uses {{ and }} for the template
+		installTemplate := template.Must(template.New("taskfile").
+			Delims("[[", "]]").
+			Parse(string(tpl.InstallScriptTemplate)))
+		err = installTemplate.Execute(installer, e)
+		if err != nil {
+			return err
+		}
+		// make the file executable
+		if err := os.Chmod(tf, 0755); err != nil {
+			return err
+		}
+
+	}
 	if e.Taskfile {
 		tf := fmt.Sprintf("%s/Taskfile.yml", e.AbsolutePath)
 		if exists(tf) && !e.Overwrite {
