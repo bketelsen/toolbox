@@ -59,7 +59,7 @@ func (e *Extras) Create() error {
 		defer installer.Close()
 		// change the delimiters to [[ and ]]
 		// this is because the template uses {{ and }} for the template
-		installTemplate := template.Must(template.New("taskfile").
+		installTemplate := template.Must(template.New("installer").
 			Delims("[[", "]]").
 			Parse(string(tpl.InstallScriptTemplate)))
 		err = installTemplate.Execute(installer, e)
