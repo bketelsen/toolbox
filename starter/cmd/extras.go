@@ -22,8 +22,9 @@ import (
 )
 
 var (
-	overwrite bool
-	extrasCmd = &cobra.Command{
+	overwrite                                                            bool
+	taskfile, releaser, devcontainer, actionsGo, actionsPages, installer bool
+	extrasCmd                                                            = &cobra.Command{
 		Use:   "extras",
 		Short: "Add all the extras to your project",
 		Long: `Extras (starter extras) adds additional functionality to your project.
@@ -39,7 +40,7 @@ Included:
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := doExtras(cmd, true, true, true, true, true, true, true, overwrite)
+			err := doExtras(cmd, taskfile, releaser, devcontainer, actionsGo, actionsPages, installer, overwrite)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
 				cobra.CheckErr(err)
@@ -52,17 +53,17 @@ Included:
 
 func init() {
 	extrasCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Overwrite existing files")
-
+	extrasCmd.Flags().BoolVarP(&taskfile, "taskfile", "t", false, "Add Taskfile")
+	extrasCmd.Flags().BoolVarP(&releaser, "goreleaser", "g", false, "Add GoReleaser")
+	extrasCmd.Flags().BoolVarP(&devcontainer, "devcontainer", "d", false, "Add DevContainer")
+	extrasCmd.Flags().BoolVarP(&actionsGo, "actions-go", "b", false, "Add GitHub Actions for Go")
+	extrasCmd.Flags().BoolVarP(&actionsPages, "actions-pages", "p", false, "Add GitHub Actions for Pages")
+	extrasCmd.Flags().BoolVarP(&installer, "installer", "i", false, "Add Installer script")
+	//	viper.BindPFlags(extrasCmd.Flags())
 }
 
 func doExtras(_ *cobra.Command,
-	taskfile bool,
-	releaser bool,
-	devcontainer bool,
-	actionsGo bool,
-	actionsPages bool,
-	actionsRelease bool,
-	installer bool,
+	taskfile, releaser, devcontainer, actionsGo, actionsPages, installer bool,
 	replace bool,
 ) error {
 	wd, err := os.Getwd()
@@ -73,7 +74,12 @@ func doExtras(_ *cobra.Command,
 	modName := getModImportPath()
 	binName := filepath.Base(modName)
 	repository := viper.GetString("repository")
-	owner, repo := getOwnerRepo(repository)
+	owner, repo := getAndSetOwnerRepo(repository)
+
+	config, err := GetActiveConfig()
+	if err != nil {
+		return err
+	}
 
 	extras := &Extras{
 		Taskfile:       taskfile,
@@ -81,7 +87,7 @@ func doExtras(_ *cobra.Command,
 		DevContainer:   devcontainer,
 		ActionsGo:      actionsGo,
 		ActionsPages:   actionsPages,
-		ActionsRelease: actionsRelease,
+		ActionsRelease: releaser,
 		Installer:      installer,
 		Overwrite:      replace,
 		Project: &Project{
@@ -91,6 +97,7 @@ func doExtras(_ *cobra.Command,
 			Repository:   repository,
 			Owner:        owner,
 			Repo:         repo,
+			Config:       &config,
 		},
 	}
 	return extras.Create()

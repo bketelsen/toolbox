@@ -72,16 +72,19 @@ func Execute() error {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.starter.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is starter.yaml)")
 	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-	rootCmd.PersistentFlags().StringP("repository", "r", "https://github.com/your/project", "gitHub repository URL")
+	rootCmd.PersistentFlags().StringP("repository", "r", "https://github.com/you/project", "gitHub repository URL")
 
 	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
 	rootCmd.PersistentFlags().Bool("viper", false, "use Viper for configuration")
+	rootCmd.PersistentFlags().Bool("verbose", false, "verbose output")
+
 	cobra.CheckErr(viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author")))
 	cobra.CheckErr(viper.BindPFlag("repository", rootCmd.PersistentFlags().Lookup("repository")))
 	cobra.CheckErr(viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper")))
-	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
+	viper.SetDefault("author", "NAME HERE")
+	viper.SetDefault("email", "EMAIL ADDRESS")
 	viper.SetDefault("license", "none")
 	viper.SetDefault("repository", "https://github.com/your/project")
 	rootCmd.AddCommand(addCmd)
@@ -91,6 +94,7 @@ func init() {
 	rootCmd.AddCommand(installerCmd)
 	rootCmd.AddCommand(taskfileCmd)
 	rootCmd.AddCommand(releaserCmd)
+	rootCmd.AddCommand(gendocsCmd)
 }
 
 func initConfig() {
@@ -98,14 +102,12 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
 
 		// Search config in home directory with name ".cobra" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".starter")
+		viper.SetConfigName("starter.yaml") // name of config file (without extension)
+		viper.SetConfigType("yaml")         // REQUIRED if the config file does not have the extension in the name
+		viper.AddConfigPath(".")            // starter config file should be in the working directory
+
 	}
 
 	viper.AutomaticEnv()

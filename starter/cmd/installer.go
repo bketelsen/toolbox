@@ -28,7 +28,7 @@ Included:
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := doExtras(cmd, false, false, false, false, false, false, true, overwrite)
+			err := doExtras(cmd, false, false, false, false, false, true, overwrite)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
 				cobra.CheckErr(err)

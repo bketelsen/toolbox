@@ -26,6 +26,7 @@ type Project struct {
 	Viper        bool
 	AppName      string
 	Summary      *TaskSummary
+	Config       *Config
 }
 
 type Command struct {
@@ -70,6 +71,7 @@ func (e *Extras) Create() error {
 		if err := os.Chmod(tf, 0755); err != nil {
 			return err
 		}
+		SetKeyAndSaveConfig("installer", true)
 
 	}
 	if e.Taskfile {
@@ -91,6 +93,24 @@ func (e *Extras) Create() error {
 		if err != nil {
 			return err
 		}
+		tfchecks := fmt.Sprintf("%s/Taskfile.checks.yml", e.AbsolutePath)
+		if exists(tfchecks) && !e.Overwrite {
+			return fmt.Errorf("found existing Taskfile.checks.yml, use -o to overwrite")
+		}
+		taskfileChecks, err := os.Create(tfchecks)
+		if err != nil {
+			return err
+		}
+		defer taskfileChecks.Close()
+		// change the delimiters to [[ and ]]
+		// this is because the template uses {{ and }} for the template
+		taskfileChecksTemplate := template.Must(template.New("taskfilechecks").
+			Delims("[[", "]]").
+			Parse(string(tpl.TaskfileChecksTemplate)))
+		err = taskfileChecksTemplate.Execute(taskfileChecks, e)
+		if err != nil {
+			return err
+		}
 		summary, err := getTaskSummary(e.AbsolutePath)
 		if err != nil {
 			return err
@@ -107,6 +127,7 @@ func (e *Extras) Create() error {
 		if err != nil {
 			return err
 		}
+		SetKeyAndSaveConfig(keyTaskfile, true)
 
 	}
 	if e.GoReleaser {
@@ -126,6 +147,41 @@ func (e *Extras) Create() error {
 		if err != nil {
 			return err
 		}
+		tfrelease := fmt.Sprintf("%s/Taskfile.release.yml", e.AbsolutePath)
+		if exists(tfrelease) && !e.Overwrite {
+			return fmt.Errorf("found existing Taskfile.release.yml, use -o to overwrite")
+		}
+		taskfileRelease, err := os.Create(tfrelease)
+		if err != nil {
+			return err
+		}
+		defer taskfileRelease.Close()
+		// change the delimiters to [[ and ]]
+		// this is because the template uses {{ and }} for the template
+		taskfileReleaseTemplate := template.Must(template.New("taskfilerelease").
+			Delims("[[", "]]").
+			Parse(string(tpl.TaskfileReleaseTemplate)))
+		err = taskfileReleaseTemplate.Execute(taskfileRelease, e)
+		if err != nil {
+			return err
+		}
+		summary, err := getTaskSummary(e.AbsolutePath)
+		if err != nil {
+			return err
+		}
+		e.Summary = &summary
+		summaryFile, err := os.Create(fmt.Sprintf("%s/TASKS.md", e.AbsolutePath))
+		if err != nil {
+			return err
+		}
+		defer summaryFile.Close()
+		summaryTemplate := template.Must(template.New("summary").
+			Parse(string(tpl.TaskSummaryTemplate())))
+		err = summaryTemplate.Execute(summaryFile, e)
+		if err != nil {
+			return err
+		}
+		SetKeyAndSaveConfig(keyReleaser, true)
 	}
 	if e.DevContainer {
 		dc := fmt.Sprintf("%s/.devcontainer/devcontainer.json", e.AbsolutePath)
@@ -155,6 +211,7 @@ func (e *Extras) Create() error {
 		if err != nil {
 			return err
 		}
+		SetKeyAndSaveConfig(keyDevcontainer, true)
 
 	}
 	if e.ActionsGo || e.ActionsPages || e.ActionsRelease {
@@ -179,6 +236,7 @@ func (e *Extras) Create() error {
 		if err != nil {
 			return err
 		}
+		SetKeyAndSaveConfig(keyActionsGo, true)
 	}
 	if e.ActionsPages {
 		pagesYml := fmt.Sprintf("%s/.github/workflows/pages.yml", e.AbsolutePath)
@@ -197,6 +255,7 @@ func (e *Extras) Create() error {
 		if err != nil {
 			return err
 		}
+		SetKeyAndSaveConfig(keyActionsPages, true)
 	}
 	if e.ActionsRelease {
 		releaseYml := fmt.Sprintf("%s/.github/workflows/release.yml", e.AbsolutePath)
@@ -215,6 +274,7 @@ func (e *Extras) Create() error {
 		if err != nil {
 			return err
 		}
+		SetKeyAndSaveConfig(keyActionsRelease, true)
 	}
 	return nil
 }

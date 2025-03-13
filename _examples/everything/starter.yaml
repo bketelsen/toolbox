@@ -1,0 +1,19 @@
+actions-go: true
+actions-pages: true
+actions-release: true
+author: Brian Smith
+basepath: /everything
+devcontainer: true
+docs: true
+email: you@yourdomain.com
+extras: true
+full-name: Toolbox User
+installer: true
+license: MIT
+owner: bketelsen
+releaser: true
+repo: everything
+repository: https://github.com/bketelsen/everything
+taskfile: true
+useviper: true
+verbose: false

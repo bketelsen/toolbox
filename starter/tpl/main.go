@@ -29,6 +29,12 @@ var GoActionTemplate []byte
 //go:embed Taskfile.yml.tpl
 var TaskfileTemplate []byte
 
+//go:embed Taskfile.checks.yml.tpl
+var TaskfileChecksTemplate []byte
+
+//go:embed Taskfile.release.yml.tpl
+var TaskfileReleaseTemplate []byte
+
 //go:embed docsTaskfile.yml.tpl
 var DocsTaskfileTemplate []byte
 
@@ -295,8 +301,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// {{ .CmdName }}Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	docsCmd.Flags().StringP("basepath", "b", "{{ .AppName }}", "Base path for the documentation (default is /{{ .AppName }})")
-	viper.BindPFlag("basepath", docsCmd.Flags().Lookup("basepath"))
+	{{ .CmdName }}Cmd.Flags().StringP("basepath", "b", "{{ .AppName }}", "Base path for the documentation (default is /{{ .AppName }})")
+	viper.BindPFlag("basepath", {{ .CmdName }}Cmd.Flags().Lookup("basepath"))
 }
 const fmTemplate = ` + "`" + `---
 date: %s
@@ -311,7 +317,16 @@ func TaskSummaryTemplate() []byte {
 	return []byte(`
 ## Available Tasks
 {{ range .Summary.Tasks }}
-- {{ .Name }}: {{  .Desc }} 
+### {{ .Name }}
+
+{{ if .Desc }}Description: {{  .Desc }}
+{{- end }}
+{{ if .Summary }}Summary: {{ .Summary }}
+{{- end }}
+Run this task:
+` + "```" + `
+task {{ .Name }}
+` + "```" + `
 {{ end }}
 `)
 }
