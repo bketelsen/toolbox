@@ -68,6 +68,13 @@ tasks:
       - sudo dpkg -i goreleaser-pro_2.7.0_amd64.deb
       - rm goreleaser-pro_2.7.0_amd64.deb
     silent: true
+  starterdocs:
+    desc: Generate the starter docs
+    deps: [release-local]
+    cmds:
+      - cp ./starter/install.sh ./docs/static/install.sh
+      - ./dist/linux_amd64/starter_linux_amd64_v1/starter gendocs -b "/toolbox"
+    silent: true
   site:
     desc: Run hugo dev server
     #deps: [build, generate]

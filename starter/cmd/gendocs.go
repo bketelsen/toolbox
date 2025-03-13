@@ -21,7 +21,7 @@ import (
 var gendocsCmd = &cobra.Command{
 	Use:    "gendocs",
 	Hidden: true,
-	Short:  "Generates documentation for the project",
+	Short:  "Generates documentation for the starter project",
 	Run: func(cmd *cobra.Command, args []string) {
 		bp := viper.GetString("basepath")
 		cmd.Logger.Info("Base path for documentation", "basepath", bp)
@@ -59,8 +59,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// docsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	docsCmd.Flags().StringP("basepath", "b", "", "Base path for the documentation (default is /)")
-	viper.BindPFlag("basepath", docsCmd.Flags().Lookup("basepath"))
+	gendocsCmd.Flags().StringP("basepath", "b", "", "Base path for the documentation (default is /)")
+	viper.BindPFlag("basepath", gendocsCmd.Flags().Lookup("basepath"))
 }
 
 const fmTemplate = `---
