@@ -1,0 +1,19 @@
+actions-go: false
+actions-pages: false
+actions-release: false
+author: Brian Smith
+basepath: /withdocs
+devcontainer: false
+docs: true
+email: you@yourdomain.com
+extras: false
+full-name: Toolbox User
+installer: false
+license: MIT
+owner: bketelsen
+releaser: false
+repo: withdocs
+repository: https://github.com/bketelsen/withdocs
+taskfile: true
+useviper: true
+verbose: false

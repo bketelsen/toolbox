@@ -29,7 +29,7 @@ Included:
 
 		Run: func(cmd *cobra.Command, args []string) {
 
-			err := doExtras(cmd, false, true, false, false, false, true, false, overwrite)
+			err := doExtras(cmd, false, true, false, false, false, false, overwrite)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
 				cobra.CheckErr(err)

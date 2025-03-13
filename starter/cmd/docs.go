@@ -24,7 +24,7 @@ var (
 	docsCmd = &cobra.Command{
 		Use:     "docs",
 		Aliases: []string{"command"},
-		Short:   "Add a docs command and documentation template to a Cobra Application",
+		Short:   "Add a gendocs command and documentation template to a Cobra Application",
 		Long:    `Docs (cobra-cli docs) will create a new docs command`,
 
 		Run: func(cmd *cobra.Command, args []string) {
@@ -42,12 +42,20 @@ func init() {
 	cobra.CheckErr(docsCmd.Flags().MarkDeprecated("package", "this operation has been removed."))
 }
 
-func doDocs(_ *cobra.Command) error {
+func doDocs(cmd *cobra.Command) error {
 	wd, err := os.Getwd()
 	cobra.CheckErr(err)
 	modName := getModImportPath()
 
-	commandName := "docs"
+	SetKeyAndSaveConfig("docs", true)
+	SetKeyAndSaveConfig("basepath", "/"+path.Base(modName))
+
+	config, err := GetActiveConfig()
+	if err != nil {
+		return err
+	}
+
+	commandName := "gendocs"
 	command := &Command{
 		CmdName:   commandName,
 		CmdParent: parentName,
@@ -57,8 +65,15 @@ func doDocs(_ *cobra.Command) error {
 			Legal:        getLicense(),
 			Copyright:    copyrightLine(),
 			AppName:      path.Base(modName),
+			Config:       &config,
 		},
 	}
 
-	return command.Docs()
+	err = command.Docs()
+	if err != nil {
+		return err
+	}
+	// overwrite the taskfile
+	return doExtras(cmd, true, false, false, false, false, false, true)
+
 }

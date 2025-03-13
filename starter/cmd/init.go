@@ -54,6 +54,27 @@ Cobra init must be run inside of a go module (please run "go mod init <MODNAME>"
 		Run: func(cmd *cobra.Command, args []string) {
 
 			cmd.Logger.Info("initializing project")
+
+			// then get the configs for viper
+			if viper.GetBool("UseViper") {
+				SetKeyAndSaveConfig("useViper", true)
+			}
+
+			// then get the configs for the license
+			if userLicense != "" {
+				SetKeyAndSaveConfig("license", userLicense)
+			} else {
+				SetKeyAndSaveConfig("license", getLicense())
+			}
+			// get this written to disk before we start doing anything
+			// from here on out we will be using the config file
+			// and not the flags, so we need to make sure
+			// to propagate any changed flags back to the config file
+			cmd.Logger.Info("writing initial config")
+			err := writeConfigWithDefaults("starter.yaml")
+			if err != nil {
+				cmd.Logger.Error(err.Error())
+			}
 			projectPath, err := initializeProject(args)
 			if err != nil {
 				cmd.Logger.Error(err.Error())
@@ -84,7 +105,8 @@ Cobra init must be run inside of a go module (please run "go mod init <MODNAME>"
 			// generate extras if requested
 			if viper.GetBool("extras") {
 				cmd.Logger.Info("creating extras")
-				err = doExtras(cmd, true, true, true, true, true, true, true, false)
+				// overwrite the files if they exist (taskfile should already be there)
+				err = doExtras(cmd, true, true, true, true, true, true, true)
 				if err != nil {
 					cmd.Logger.Error(err.Error())
 					cobra.CheckErr(err)
@@ -97,9 +119,9 @@ Cobra init must be run inside of a go module (please run "go mod init <MODNAME>"
 )
 
 func init() {
-	initCmd.Flags().BoolP("docs", "d", true, "generate documentation")
+	initCmd.Flags().BoolP("docs", "d", false, "generate documentation")
 	viper.BindPFlag("docs", initCmd.Flags().Lookup("docs"))
-	initCmd.Flags().BoolP("extras", "e", true, "generate extra configs")
+	initCmd.Flags().BoolP("extras", "e", false, "generate extra configs")
 	viper.BindPFlag("extras", initCmd.Flags().Lookup("extras"))
 
 }
@@ -117,7 +139,10 @@ func initializeProject(args []string) (string, error) {
 	}
 
 	modName := getModImportPath()
-
+	config, err := GetActiveConfig()
+	if err != nil {
+		return "", err
+	}
 	project := &Project{
 		AbsolutePath: wd,
 		PkgName:      modName,
@@ -125,6 +150,7 @@ func initializeProject(args []string) (string, error) {
 		Copyright:    copyrightLine(),
 		Viper:        viper.GetBool("useViper"),
 		AppName:      path.Base(modName),
+		Config:       &config,
 	}
 
 	if err := project.Create(); err != nil {
