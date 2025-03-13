@@ -40,7 +40,7 @@ var (
 	rootCmd = &cobra.Command{
 		Use:     "starter",
 		Version: versionString(),
-		Short:   "A generator for Cobra based Applications",
+		Short:   "A generator for toolbox/cobra based applications",
 		Long: `Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,

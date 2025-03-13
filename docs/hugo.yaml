@@ -57,7 +57,7 @@ menu:
         type: search
     - name: GitHub
       weight: 6
-      url: "https://github.com/bketelsen/inventory"
+      url: "https://github.com/bketelsen/toolbox"
       params:
         icon: github
 

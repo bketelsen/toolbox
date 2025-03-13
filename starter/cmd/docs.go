@@ -25,7 +25,10 @@ var (
 		Use:     "docs",
 		Aliases: []string{"command"},
 		Short:   "Add a gendocs command and documentation template to a Cobra Application",
-		Long:    `Docs (cobra-cli docs) will create a new docs command`,
+		Long: `Docs (starter docs) will create a new gendocs command.
+		
+The gendocs command will generate documentation for your application
+in markdown format suitable for use with any static site generator.`,
 
 		Run: func(cmd *cobra.Command, args []string) {
 

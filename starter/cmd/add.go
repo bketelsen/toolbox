@@ -29,7 +29,7 @@ var (
 		Use:     "add [command name]",
 		Aliases: []string{"command"},
 		Short:   "Add a command to a Cobra Application",
-		Long: `Add (cobra-cli add) will create a new command, with a license and
+		Long: `Add (starter add) will create a new command, with a license and
 the appropriate structure for a Cobra-based CLI application,
 and register it to its parent (default rootCmd).
 
