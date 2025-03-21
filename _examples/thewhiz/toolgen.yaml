@@ -1,0 +1,16 @@
+actionspages: true
+appname: thewhiz
+author: Brian Ketelsen
+basepath: /thewhiz
+devcontainer: true
+docs: true
+email: mail@bjk.fyi
+installer: true
+license: mit
+modulename: thewhiz
+owner: bketelsen
+releaser: true
+repo: thewhiz
+repository: https://github.com/bketelsen/thewhiz
+taskfile: true
+verbose: false

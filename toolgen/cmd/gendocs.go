@@ -22,7 +22,7 @@ var gendocsCmd = &cobra.Command{
 	Hidden: true,
 	Short:  "Generates documentation for the toolgen project",
 	Run: func(cmd *cobra.Command, args []string) {
-		bp := cmd.GlobalConfig().GetString("basepath")
+		bp := cmd.Config().GetString("basepath")
 		cmd.Logger.Info("Base path for documentation", "basepath", bp)
 		linkHandler := func(name string) string {
 			base := strings.TrimSuffix(name, path.Ext(name))

@@ -53,6 +53,8 @@ var rootCmd = &cobra.Command{
 	Version: bversion.String(),
 	Short:   "A generator for Go CLI applications.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		// set the slog default logger to the cobra logger
+		slog.SetDefault(cmd.Logger)
 		// set log level based on the --verbose flag
 		if cmd.GlobalConfig().GetBool("verbose") {
 			cmd.SetLogLevel(slog.LevelDebug)
@@ -101,12 +103,9 @@ var rootCmd = &cobra.Command{
 		return config
 	},
 
-	Run: func(cmd *cobra.Command, args []string) {
+	// Run: func(cmd *cobra.Command, args []string) {
 
-		// set the slog default logger to the cobra logger
-		slog.SetDefault(cmd.Logger)
-
-	},
+	// },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
