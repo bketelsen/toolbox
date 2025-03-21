@@ -51,6 +51,10 @@ menu:
       name: Guides
       pageRef: /docs/guides
       weight: 3
+    - identifier: recipes
+      name: Recipes
+      pageRef: /docs/recipes
+      weight: 4
     - name: Search
       weight: 5
       params:

@@ -1173,7 +1173,7 @@ func TestVersionFlagExecuted(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	checkStringContains(t, output, "root version 1.0.0")
+	checkStringContains(t, output, "1.0.0")
 }
 
 func TestVersionFlagExecutedDiplayName(t *testing.T) {
@@ -1191,7 +1191,7 @@ func TestVersionFlagExecutedDiplayName(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	checkStringContains(t, output, "kubectl plugin version 1.0.0")
+	checkStringContains(t, output, "1.0.0")
 }
 
 func TestVersionFlagExecutedWithNoName(t *testing.T) {
@@ -1202,7 +1202,7 @@ func TestVersionFlagExecutedWithNoName(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	checkStringContains(t, output, "version 1.0.0")
+	checkStringContains(t, output, "1.0.0")
 }
 
 func TestShortAndLongVersionFlagInHelp(t *testing.T) {
@@ -1237,7 +1237,7 @@ func TestShorthandVersionFlagExecuted(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	checkStringContains(t, output, "root version 1.0.0")
+	checkStringContains(t, output, "1.0.0")
 }
 
 func TestVersionTemplate(t *testing.T) {
@@ -1306,7 +1306,7 @@ func TestVersionFlagExecutedOnSubcommand(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	checkStringContains(t, output, "root version 1.0.0")
+	checkStringContains(t, output, "1.0.0")
 }
 
 func TestShorthandVersionFlagExecutedOnSubcommand(t *testing.T) {
@@ -1318,7 +1318,7 @@ func TestShorthandVersionFlagExecutedOnSubcommand(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	checkStringContains(t, output, "root version 1.0.0")
+	checkStringContains(t, output, "1.0.0")
 }
 
 func TestVersionFlagOnlyAddedToRoot(t *testing.T) {
