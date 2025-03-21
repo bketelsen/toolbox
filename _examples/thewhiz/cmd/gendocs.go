@@ -76,6 +76,7 @@ func init() {
 	// change default to "" in this flag if you will be hosting elsewhere and don't need a basepath
 	gendocsCmd.Flags().StringP("basepath", "b", "thewhiz", "Base path for the documentation (default is /thewhiz)")
 }
+
 const fmTemplate = `---
 date: %s
 title: "%s"

@@ -25,7 +25,7 @@ import (
 	"os"
 
 	"github.com/bketelsen/toolbox/cobra"
-    goversion "github.com/bketelsen/toolbox/go-version"
+	goversion "github.com/bketelsen/toolbox/go-version"
 )
 
 var appname = "thewhiz"
@@ -41,9 +41,9 @@ var bversion = buildVersion(version, commit, date, builtBy, treeState)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "thewhiz",
+	Use:     "thewhiz",
 	Version: bversion.String(),
-	Short: "A brief description of your application",
+	Short:   "A brief description of your application",
 	Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
 
