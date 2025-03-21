@@ -1,6 +1,23 @@
 /*
-{{ .Project.Copyright }}
-{{ if .Legal.Header }}{{ .Legal.Header }}{{ end }}
+Copyright © 2025 Brian Ketelsen <mail@bjk.fyi>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 */
 package cmd
 
@@ -17,9 +34,9 @@ import (
 	"github.com/bketelsen/toolbox/cobra/doc"
 )
 
-// {{ .CmdName }}Cmd represents the {{ .CmdName }} command
-var {{ .CmdName }}Cmd = &cobra.Command{
-	Use:   "{{ .CmdName }}",
+// gendocsCmd represents the gendocs command
+var gendocsCmd = &cobra.Command{
+	Use:   "gendocs",
 	Short: "Generates documentation for the project",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -53,12 +70,13 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	{{ .CmdParent }}.AddCommand({{ .CmdName }}Cmd)
+	rootCmd.AddCommand(gendocsCmd)
 
-	// Basepath assumes Github Pages install at https://{{ .Owner }}.github.io/{{ .AppName }}
+	// Basepath assumes Github Pages install at https://bketelsen.github.io/thewhiz
 	// change default to "" in this flag if you will be hosting elsewhere and don't need a basepath
-	{{ .CmdName }}Cmd.Flags().StringP("basepath", "b", "{{ .AppName }}", "Base path for the documentation (default is /{{ .AppName }})")
+	gendocsCmd.Flags().StringP("basepath", "b", "thewhiz", "Base path for the documentation (default is /thewhiz)")
 }
+
 const fmTemplate = `---
 date: %s
 title: "%s"
