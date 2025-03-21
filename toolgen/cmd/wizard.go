@@ -215,6 +215,15 @@ information needed to create the application.
 				devcontainer = true
 			}
 			huh.NewConfirm().
+				Title("Add GitHub Actions for Go?").
+				Value(&confirm).
+				Run()
+
+			if confirm {
+				cmd.Logger.Info("Adding GitHub Actions for Go")
+				actionsGo = true
+			}
+			huh.NewConfirm().
 				Title("Add bash installer script?").
 				Value(&confirm).
 				Run()
