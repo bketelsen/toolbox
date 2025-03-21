@@ -40,9 +40,7 @@ in markdown format suitable for use with any static site generator.`,
 )
 
 func init() {
-	docsCmd.Flags().StringVarP(&packageName, "package", "t", "", "target package name (e.g. github.com/spf13/hugo)")
 	docsCmd.Flags().StringVarP(&parentName, "parent", "p", "rootCmd", "variable name of parent command for this command")
-	cobra.CheckErr(docsCmd.Flags().MarkDeprecated("package", "this operation has been removed."))
 }
 
 func doDocs(cmd *cobra.Command) error {
