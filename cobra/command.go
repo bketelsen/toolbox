@@ -30,10 +30,14 @@ import (
 
 	"github.com/bketelsen/toolbox/slug"
 	flag "github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 const (
-	FlagSetByCobraAnnotation     = "cobra_annotation_flag_set_by_cobra"
+	FlagSetByCobraAnnotation = "cobra_annotation_flag_set_by_cobra"
+	FlagHasEnv               = "cobra_annotation_flag_has_env"
+	FlagEnv                  = "cobra_annotation_flag_env"
+
 	CommandDisplayNameAnnotation = "cobra_annotation_command_display_name"
 
 	helpFlagName    = "help"
@@ -117,6 +121,15 @@ type Command struct {
 	// will print content of the "Version" variable. A shorthand "v" flag will also be added if the
 	// command does not define one.
 	Version string
+
+	// InitConfig: function to initialize the config. This function is called
+	// before the command is executed. It is used to set up a Viper instance
+	// for the command. The Viper instance created on the Root command is available
+	// to all subcommands as `cmd.GlobalConfig()`. Each subcommand also has its own
+	// Viper instance that is created by calling this function. The Viper instance
+	// created by this function is available to the command as `cmd.Config()`.
+	// If a function is not provided, a default Viper instance will be created.
+	InitConfig func() *viper.Viper
 
 	// The *Run functions are executed in the following order:
 	//   * PersistentPreRun()
@@ -223,6 +236,8 @@ type Command struct {
 	}
 
 	ctx context.Context
+
+	config *viper.Viper
 
 	// commands is the list of commands supported by this program.
 	commands []*Command
@@ -418,6 +433,26 @@ func (c *Command) InOrStdin() io.Reader {
 
 func (c *Command) SetLogger(logger *slog.Logger) {
 	c.Logger = logger
+}
+
+func (c *Command) Config() *viper.Viper {
+	// if c.HasParent() {
+	// 	return c.parent.Config()
+	// }
+	if c.config == nil {
+		c.config = viper.New()
+	}
+	return c.config
+}
+
+func (c *Command) GlobalConfig() *viper.Viper {
+	if c.HasParent() {
+		return c.parent.Config()
+	}
+	if c.config == nil {
+		c.config = viper.New()
+	}
+	return c.config
 }
 
 // SetLogLevel sets the log level for the command.
@@ -1152,6 +1187,60 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 		}
 		return c, err
 	}
+
+	replacer := strings.NewReplacer(".", "_", "-", "")
+	// initialize the root command's config
+	if c.InitConfig != nil {
+		c.config = c.InitConfig()
+	} else {
+		c.config = viper.New()
+	}
+	c.PersistentFlags().VisitAll(func(f *flag.Flag) {
+		c.Config().BindPFlag(f.Name, f)
+		pfx := cmd.Config().GetEnvPrefix()
+		if pfx != "" {
+			pfx = strings.ToUpper(pfx) + "_"
+		}
+		if f.Annotations == nil {
+			f.Annotations = make(map[string][]string)
+		}
+		f.Annotations[FlagHasEnv] = []string{"true"}
+		f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
+	})
+
+	// initialize the child command's config
+	if cmd.InitConfig != nil {
+		cmd.config = c.InitConfig()
+	} else {
+		cmd.config = viper.New()
+	}
+
+	cmd.PersistentFlags().VisitAll(func(f *flag.Flag) {
+		cmd.Config().BindPFlag(f.Name, f)
+		pfx := cmd.Config().GetEnvPrefix()
+		if pfx != "" {
+			pfx = strings.ToUpper(pfx) + "_"
+		}
+		if f.Annotations == nil {
+			f.Annotations = make(map[string][]string)
+		}
+		f.Annotations[FlagHasEnv] = []string{"true"}
+		f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
+
+	})
+	cmd.LocalFlags().VisitAll(func(f *flag.Flag) {
+		cmd.Config().BindPFlag(f.Name, f)
+		pfx := cmd.config.GetEnvPrefix()
+		if pfx != "" {
+			pfx = strings.ToUpper(pfx) + "_"
+		}
+		if f.Annotations == nil {
+			f.Annotations = make(map[string][]string)
+		}
+		f.Annotations[FlagHasEnv] = []string{"true"}
+		f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
+
+	})
 
 	cmd.commandCalledAs.called = true
 	if cmd.commandCalledAs.name == "" {
@@ -2073,6 +2162,16 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 	if c.HasAvailableLocalFlags() {
 		fmt.Fprintf(w, "\n\n"+Title("Flags:")+"\n")
 		fmt.Fprint(w, trimRightSpace(c.LocalFlags().FlagUsages()))
+		if c.Config().GetEnvPrefix() != "" {
+			fmt.Fprintf(w, "\n\n"+Title("Environment Variables:")+"\n")
+			c.Flags().VisitAll(func(f *flag.Flag) {
+				if f.Annotations[FlagHasEnv] != nil {
+
+					fmt.Fprintf(w, "  %s %s\n", rpad(Keyword(f.Annotations[FlagEnv][0]), 20), f.Usage)
+				}
+			})
+			fmt.Fprintln(w)
+		}
 	}
 	if c.HasAvailableInheritedFlags() {
 		fmt.Fprintf(w, "\n\n"+Title("Global Flags:")+"\n")
@@ -2098,11 +2197,41 @@ var defaultHelpTemplate = `{{with (or .Long .Short)}}{{. | trimTrailingWhitespac
 {{end}}{{if or .Runnable .HasSubCommands}}{{.UsageString}}{{end}}`
 
 // defaultHelpFunc is equivalent to executing defaultHelpTemplate. The two should be changed in sync.
+// func defaultHelpFunc(w io.Writer, in interface{}) error {
+// 	c := in.(*Command)
+// 	var builder strings.Builder
+// 	if c.Version != "" {
+// 		//fmt.Fprintf(w, "%s version %s\n", Keyword(c.DisplayName()), Keyword(c.Version))
+// 		builder.WriteString(fmt.Sprintf("# %s\n", c.DisplayName()))
+// 	}
+
+// 	usage := c.Long
+// 	if usage == "" {
+// 		usage = c.Short
+// 	}
+// 	usage = trimRightSpace(usage)
+// 	if usage != "" {
+// 		builder.WriteString(fmt.Sprintf("%s\n", usage))
+
+// 		builder.WriteString(fmt.Sprintf("\n*version %s*\n", c.Version))
+
+// 		out, _ := glamour.Render(builder.String(), "dark")
+// 		fmt.Fprintln(w, out)
+// 		// fmt.Fprintln(w, usage)
+// 		// fmt.Fprintln(w)
+// 	}
+// 	if c.Runnable() || c.HasSubCommands() {
+// 		fmt.Fprint(w, c.UsageString())
+// 	}
+// 	return nil
+// }
+
+// defaultHelpFunc is equivalent to executing defaultHelpTemplate. The two should be changed in sync.
 func defaultHelpFunc(w io.Writer, in interface{}) error {
 	c := in.(*Command)
-	if c.Version != "" {
-		fmt.Fprintf(w, "%s version %s\n", Title(c.DisplayName()), Keyword(c.Version))
-	}
+	// if c.Version != "" {
+	// 	fmt.Fprintf(w, "%s version %s\n", Keyword(c.DisplayName()), Keyword(c.Version))
+	// }
 
 	usage := c.Long
 	if usage == "" {
@@ -2125,6 +2254,6 @@ var defaultVersionTemplate = `{{with .DisplayName}}{{printf "%s " .}}{{end}}{{pr
 // defaultVersionFunc is equivalent to executing defaultVersionTemplate. The two should be changed in sync.
 func defaultVersionFunc(w io.Writer, in interface{}) error {
 	c := in.(*Command)
-	_, err := fmt.Fprintf(w, "%s version %s\n", Title(c.DisplayName()), Keyword(c.Version))
+	_, err := fmt.Fprintf(w, "%s\n", c.Version)
 	return err
 }
