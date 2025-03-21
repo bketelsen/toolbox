@@ -34,7 +34,7 @@ jobs:
           distribution: goreleaser-pro
           # 'latest', 'nightly', or a semver
           version: "~> v2"
-          args: release --clean -f ./starter/.goreleaser.yaml
+          args: release --clean -f ./toolgen/.goreleaser.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Your GoReleaser Pro key, if you are using the 'goreleaser-pro' distribution

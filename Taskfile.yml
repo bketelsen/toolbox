@@ -46,7 +46,7 @@ tasks:
       - GOPROXY=proxy.golang.org go list -m github.com/bketelsen/toolbox@v{{.VERSION}}
   release-snapshot:
     cmds:
-      - goreleaser release --snapshot --clean -f ./starter/.goreleaser.yaml
+      - goreleaser release --snapshot --clean -f ./toolgen/.goreleaser.yaml
     silent: true
   release-check:
     cmds:
@@ -58,22 +58,22 @@ tasks:
       GOOS: '{{OS}}'
       GOARCH: '{{ARCH}}'
     cmds:
-      - GOOS={{.GOOS}} GOARCH={{.GOARCH}} goreleaser release --single-target --snapshot --clean -f ./starter/.goreleaser.yaml
-      - 'cp ./dist/{{.GOOS}}_{{.GOARCH}}/starter_{{.GOOS}}_{{.GOARCH}}_v1/starter /go/bin/starter'
+      - GOOS={{.GOOS}} GOARCH={{.GOARCH}} goreleaser release --single-target --snapshot --clean -f ./toolgen/.goreleaser.yaml
+      - 'cp ./dist/{{.GOOS}}_{{.GOARCH}}/toolgen_{{.GOOS}}_{{.GOARCH}}_v1/toolgen /go/bin/toolgen'
       - 'echo Release for {{.GOOS}}/{{.GOARCH}}'
     silent: true
   goreleaser:
     cmds:
-      - wget https://github.com/goreleaser/goreleaser-pro/releases/download/v2.7.0-pro/goreleaser-pro_2.7.0_amd64.deb
-      - sudo dpkg -i goreleaser-pro_2.7.0_amd64.deb
-      - rm goreleaser-pro_2.7.0_amd64.deb
+      - wget https://github.com/goreleaser/goreleaser-pro/releases/download/v2.8.1/goreleaser-pro_2.8.1_amd64.deb
+      - sudo dpkg -i goreleaser-pro_2.8.1_amd64.deb
+      - rm goreleaser-pro_2.8.1_amd64.deb
     silent: true
-  starterdocs:
-    desc: Generate the starter docs
+  toolgendocs:
+    desc: Generate the toolgen docs
     deps: [release-local]
     cmds:
-      - cp ./starter/install.sh ./docs/static/install.sh
-      - ./dist/linux_amd64/starter_linux_amd64_v1/starter gendocs -b "/toolbox"
+      - cp ./toolgen/install.sh ./docs/static/install.sh
+      - ./dist/linux_amd64/toolgen_linux_amd64_v1/toolgen gendocs -b "/toolbox"
     silent: true
   site:
     desc: Run hugo dev server
