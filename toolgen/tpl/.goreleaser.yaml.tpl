@@ -23,7 +23,7 @@ builds:
     # Default: '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser'.
     # Templates: allowed.
     ldflags:
-      - '-s -w -X [[ .PkgName ]]/cmd.version={{.Version}} -X [[ .PkgName ]]/cmd.commit={{.Commit}}'
+      - '-s -w -X [[ .PkgName ]]/cmd.date={{ .CommitDate }} -X [[ .PkgName ]]/cmd.treeState={{ .IsGitDirty }} -X [[ .PkgName ]]/cmd.version={{.Version}} -X [[ .PkgName ]]/cmd.commit={{.Commit}} -X [[ .PkgName ]]/cmd.builtBy=goreleaser'
 
 archives:
   - formats: [ 'tar.gz' ]
