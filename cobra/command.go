@@ -1144,11 +1144,8 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 
 	// initialize the root command's config
 	if c.InitConfig != nil {
-		slog.Debug("Running Global InitConfig", "command", c.Name())
 		c.config = c.InitConfig()
 	} else {
-		slog.Debug("Default Global Config", "command", c.Name())
-
 		c.config = viper.New()
 	}
 	c.PersistentFlags().VisitAll(func(f *flag.Flag) {
@@ -1212,43 +1209,41 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 		return c, err
 	}
 
-	// initialize the child command's config
-	if cmd.InitConfig != nil {
-		slog.Debug("Running InitConfig", "command", cmd.Name())
-		cmd.config = cmd.InitConfig()
-	} else {
-		slog.Debug("Default Config", "command", cmd.Name())
+	if c.Name() != cmd.Name() {
+		// initialize the child command's config
+		if cmd.InitConfig != nil {
+			cmd.config = cmd.InitConfig()
+		} else {
+			cmd.config = viper.New()
+		}
 
-		cmd.config = viper.New()
+		cmd.PersistentFlags().VisitAll(func(f *flag.Flag) {
+			cmd.config.BindPFlag(f.Name, f)
+			pfx := cmd.config.GetEnvPrefix()
+			if pfx != "" {
+				pfx = strings.ToUpper(pfx) + "_"
+			}
+			if f.Annotations == nil {
+				f.Annotations = make(map[string][]string)
+			}
+			f.Annotations[FlagHasEnv] = []string{"true"}
+			f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
+
+		})
+		cmd.LocalFlags().VisitAll(func(f *flag.Flag) {
+			cmd.config.BindPFlag(f.Name, f)
+			pfx := cmd.config.GetEnvPrefix()
+			if pfx != "" {
+				pfx = strings.ToUpper(pfx) + "_"
+			}
+			if f.Annotations == nil {
+				f.Annotations = make(map[string][]string)
+			}
+			f.Annotations[FlagHasEnv] = []string{"true"}
+			f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
+
+		})
 	}
-
-	cmd.PersistentFlags().VisitAll(func(f *flag.Flag) {
-		cmd.config.BindPFlag(f.Name, f)
-		pfx := cmd.config.GetEnvPrefix()
-		if pfx != "" {
-			pfx = strings.ToUpper(pfx) + "_"
-		}
-		if f.Annotations == nil {
-			f.Annotations = make(map[string][]string)
-		}
-		f.Annotations[FlagHasEnv] = []string{"true"}
-		f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
-
-	})
-	cmd.LocalFlags().VisitAll(func(f *flag.Flag) {
-		cmd.config.BindPFlag(f.Name, f)
-		pfx := cmd.config.GetEnvPrefix()
-		if pfx != "" {
-			pfx = strings.ToUpper(pfx) + "_"
-		}
-		if f.Annotations == nil {
-			f.Annotations = make(map[string][]string)
-		}
-		f.Annotations[FlagHasEnv] = []string{"true"}
-		f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
-
-	})
-
 	cmd.commandCalledAs.called = true
 	if cmd.commandCalledAs.name == "" {
 		cmd.commandCalledAs.name = cmd.Name()
