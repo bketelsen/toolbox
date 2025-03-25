@@ -1144,10 +1144,10 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 
 	// initialize the root command's config
 	if c.InitConfig != nil {
-		slog.Info("Running Global InitConfig", "command", c.Name())
+		slog.Debug("Running Global InitConfig", "command", c.Name())
 		c.config = c.InitConfig()
 	} else {
-		slog.Info("Default Global Config", "command", c.Name())
+		slog.Debug("Default Global Config", "command", c.Name())
 
 		c.config = viper.New()
 	}
@@ -1214,10 +1214,10 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 
 	// initialize the child command's config
 	if cmd.InitConfig != nil {
-		slog.Info("Running InitConfig", "command", cmd.Name())
+		slog.Debug("Running InitConfig", "command", cmd.Name())
 		cmd.config = cmd.InitConfig()
 	} else {
-		slog.Info("Default Config", "command", cmd.Name())
+		slog.Debug("Default Config", "command", cmd.Name())
 
 		cmd.config = viper.New()
 	}
