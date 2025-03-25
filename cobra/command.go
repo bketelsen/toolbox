@@ -1140,6 +1140,30 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 		c.ctx = context.Background()
 	}
 
+	replacer := strings.NewReplacer(".", "_", "-", "")
+
+	// initialize the root command's config
+	if c.InitConfig != nil {
+		slog.Debug("Running Global InitConfig", "command", c.Name())
+		c.config = c.InitConfig()
+	} else {
+		slog.Debug("Default Global Config", "command", c.Name())
+
+		c.config = viper.New()
+	}
+	c.PersistentFlags().VisitAll(func(f *flag.Flag) {
+		c.config.BindPFlag(f.Name, f)
+		pfx := c.config.GetEnvPrefix()
+		if pfx != "" {
+			pfx = strings.ToUpper(pfx) + "_"
+		}
+		if f.Annotations == nil {
+			f.Annotations = make(map[string][]string)
+		}
+		f.Annotations[FlagHasEnv] = []string{"true"}
+		f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
+	})
+
 	// Regardless of what command execute is called on, run on Root only
 	if c.HasParent() {
 		return c.Root().ExecuteC()
@@ -1188,36 +1212,19 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 		return c, err
 	}
 
-	replacer := strings.NewReplacer(".", "_", "-", "")
-	// initialize the root command's config
-	if c.InitConfig != nil {
-		c.config = c.InitConfig()
-	} else {
-		c.config = viper.New()
-	}
-	c.PersistentFlags().VisitAll(func(f *flag.Flag) {
-		c.Config().BindPFlag(f.Name, f)
-		pfx := cmd.Config().GetEnvPrefix()
-		if pfx != "" {
-			pfx = strings.ToUpper(pfx) + "_"
-		}
-		if f.Annotations == nil {
-			f.Annotations = make(map[string][]string)
-		}
-		f.Annotations[FlagHasEnv] = []string{"true"}
-		f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
-	})
-
 	// initialize the child command's config
 	if cmd.InitConfig != nil {
-		cmd.config = c.InitConfig()
+		slog.Debug("Running InitConfig", "command", cmd.Name())
+		cmd.config = cmd.InitConfig()
 	} else {
+		slog.Debug("Default Config", "command", cmd.Name())
+
 		cmd.config = viper.New()
 	}
 
 	cmd.PersistentFlags().VisitAll(func(f *flag.Flag) {
-		cmd.Config().BindPFlag(f.Name, f)
-		pfx := cmd.Config().GetEnvPrefix()
+		cmd.config.BindPFlag(f.Name, f)
+		pfx := cmd.config.GetEnvPrefix()
 		if pfx != "" {
 			pfx = strings.ToUpper(pfx) + "_"
 		}
@@ -1229,7 +1236,7 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 
 	})
 	cmd.LocalFlags().VisitAll(func(f *flag.Flag) {
-		cmd.Config().BindPFlag(f.Name, f)
+		cmd.config.BindPFlag(f.Name, f)
 		pfx := cmd.config.GetEnvPrefix()
 		if pfx != "" {
 			pfx = strings.ToUpper(pfx) + "_"
