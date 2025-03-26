@@ -1970,8 +1970,8 @@ func TestUsageWithGroup(t *testing.T) {
 
 	// help should be ungrouped here
 	checkStringContains(t, output, "\nAdditional Commands:\n  help")
-	checkStringContains(t, output, "\ngroup1\n  cmd1")
-	checkStringContains(t, output, "\ngroup2\n  cmd2")
+	checkStringContains(t, output, "\ngroup1:\n  cmd1")
+	checkStringContains(t, output, "\ngroup2:\n  cmd2")
 }
 
 func TestUsageHelpGroup(t *testing.T) {
@@ -1989,7 +1989,7 @@ func TestUsageHelpGroup(t *testing.T) {
 
 	// now help should be grouped under "group"
 	checkStringOmits(t, output, "\nAdditional Commands:\n  help")
-	checkStringContains(t, output, "\ngroup\n  help")
+	checkStringContains(t, output, "\ngroup:\n  help")
 }
 
 func TestUsageCompletionGroup(t *testing.T) {
@@ -2009,7 +2009,7 @@ func TestUsageCompletionGroup(t *testing.T) {
 
 	// now completion should be grouped under "group"
 	checkStringOmits(t, output, "\nAdditional Commands:\n  completion")
-	checkStringContains(t, output, "\ngroup\n  completion")
+	checkStringContains(t, output, "\ngroup:\n  completion")
 }
 
 func TestUngroupedCommand(t *testing.T) {
@@ -2045,7 +2045,7 @@ func TestAddGroup(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	checkStringContains(t, output, "\nTest group\n  cmd")
+	checkStringContains(t, output, "\nTest group:\n  cmd")
 }
 
 func TestWrongGroupFirstLevel(t *testing.T) {

@@ -2144,7 +2144,7 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 			}
 		} else {
 			for _, group := range c.Groups() {
-				fmt.Fprintf(w, "\n\n%s", group.Title)
+				fmt.Fprintf(w, "\n\n"+Title(group.Title+":"))
 				for _, subcmd := range cmds {
 					if subcmd.GroupID == group.ID && (subcmd.IsAvailableCommand() || subcmd.Name() == helpCommandName) {
 						fmt.Fprintf(w, "\n  %s %s", Keyword(rpad(subcmd.Name(), subcmd.NamePadding())), subcmd.Short)
