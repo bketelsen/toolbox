@@ -60,7 +60,7 @@ information needed to create the application.
 			// get the name of the current directory
 			dir, err := os.Getwd()
 			if err != nil {
-				cmd.Println(ui.Error("Failed to get current directory"), err.Error())
+				ui.Error("Failed to get current directory", err.Error())
 				return
 			}
 			appName = filepath.Base(dir)
@@ -68,7 +68,7 @@ information needed to create the application.
 			// check to see if the directory we are in is empty
 			entries, err := os.ReadDir(".")
 			if err != nil {
-				cmd.Println(ui.Error("Failed to read directory"), err.Error())
+				ui.Error("Failed to read directory", err.Error())
 				return
 			}
 			if len(entries) > 0 {
@@ -154,7 +154,7 @@ information needed to create the application.
 			// run go mod init
 			cmd.Logger.Info("Running go mod init", "module", modName)
 			if err := runGoModInit(modName); err != nil {
-				cmd.Println(ui.Error("Failed to run go mod init"), err.Error())
+				ui.Error("Failed to run go mod init", err.Error())
 				return
 			}
 			newCfg := "toolgen.yaml"
@@ -164,18 +164,18 @@ information needed to create the application.
 			v.AddConfigPath(".")
 
 			if err := v.MergeConfigMap(cfgMap); err != nil {
-				cmd.Println(ui.Error("Failed to merge config map"), err.Error())
+				ui.Error("Failed to merge config map", err.Error())
 				return
 			}
 			if err := v.WriteConfigAs(newCfg); err != nil {
-				cmd.Println(ui.Error("Failed to write config file"), err.Error())
+				ui.Error("Failed to write config file", err.Error())
 				return
 			}
 			cmd.Logger.Info("Creating new application", "name", appName, "module", modName, "license", userLicense, "email", email, "name", name)
 
 			abspath, err := initializeProject([]string{"."}, v)
 			if err != nil {
-				cmd.Println(ui.Error("Failed to create project"), err.Error())
+				ui.Error("Failed to create project", err.Error())
 				return
 			}
 			// run go mod tidy
