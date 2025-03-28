@@ -13,9 +13,7 @@ import (
 // DefaultStyles compose visual elements of the UI.
 var DefaultStyles Styles
 
-var (
-	BoldStyle = lipgloss.NewStyle().Bold(true)
-)
+var BoldStyle = lipgloss.NewStyle().Bold(true)
 
 type Styles struct {
 	Code,
@@ -35,9 +33,7 @@ type Styles struct {
 	Wrap lipgloss.Style
 }
 
-var (
-	color termenv.Profile
-)
+var color termenv.Profile
 
 var (
 	// ANSI color codes

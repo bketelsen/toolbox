@@ -72,16 +72,16 @@ var rootCmd = &cobra.Command{
 			delete(cfgMap, "write-config")
 			v := viper.New()
 			if err := v.MergeConfigMap(cfgMap); err != nil {
-				cmd.Println(ui.Error("Failed to merge config map"), err.Error())
+				ui.Error("Failed to merge config map", err.Error())
 				return
 			}
 			if err := v.WriteConfigAs(cfgFile); err != nil {
-				cmd.Println(ui.Error("Failed to write config file"), err.Error())
+				ui.Error("Failed to write config file", err.Error())
 				return
 			}
-			cmd.Println(ui.Info("Config file written to", cfgFile))
-			cmd.Println(ui.Info("You can now edit the config file and run the command again"))
-			cmd.Println(ui.Info("You can also set the config file with the --config flag"))
+			ui.Info("Config file written to", cfgFile)
+			ui.Info("You can now edit the config file and run the command again")
+			ui.Info("You can also set the config file with the --config flag")
 			os.Exit(0)
 
 		}
