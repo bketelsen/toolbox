@@ -70,6 +70,20 @@ func Red(s string) string {
 	return DefaultStyles.Error.Render(s)
 }
 
+func Yellow(s string) string {
+	if !isTerm() {
+		return s
+	}
+	return DefaultStyles.Warn.Render(s)
+}
+
+func Green(s string) string {
+	if !isTerm() {
+		return s
+	}
+	return DefaultStyles.Success.Render(s)
+}
+
 // Timestamp formats a timestamp for display.
 func Timestamp(t time.Time) string {
 	return DefaultStyles.DateTimeStamp.Render(t.Format(time.Stamp))

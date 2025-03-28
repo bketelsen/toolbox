@@ -28,7 +28,7 @@ func (m cliMessage) String() string {
 	str.WriteString(m.Style.Render(m.Header))
 	_, _ = str.WriteString("\r\n")
 	for _, line := range m.Lines {
-		_, _ = fmt.Fprintf(&str, "  %s %s\r\n", m.Style.Render("|"), line)
+		_, _ = fmt.Fprintf(&str, "  %s %s\r\n", m.Style.Render("*"), line)
 	}
 	return str.String()
 }
@@ -43,10 +43,37 @@ func Warn(header string, lines ...string) string {
 	}.String()
 }
 
+func WarnPrefix(prefix, header string, lines ...string) string {
+	return cliMessage{
+		Style:  DefaultStyles.Warn,
+		Prefix: Yellow(prefix) + ": ",
+		Header: header,
+		Lines:  lines,
+	}.String()
+}
+
 // Info writes a log to the writer provided.
 func Info(header string, lines ...string) string {
 	return cliMessage{
 		Header: header,
+		Lines:  lines,
+	}.String()
+}
+
+// InfoPrefix writes a log with a prefix to the writer provided.
+func InfoPrefix(prefix, header string, lines ...string) string {
+	return cliMessage{
+		Header: header,
+		Prefix: prefix + ": ",
+		Lines:  lines,
+	}.String()
+}
+
+// SuccessPrefix writes a log with a prefix to the writer provided.
+func SuccessPrefix(prefix, header string, lines ...string) string {
+	return cliMessage{
+		Header: header,
+		Prefix: Green(prefix) + ": ",
 		Lines:  lines,
 	}.String()
 }
@@ -56,6 +83,16 @@ func Error(header string, lines ...string) string {
 	return cliMessage{
 		Style:  DefaultStyles.Error,
 		Prefix: "ERROR: ",
+		Header: header,
+		Lines:  lines,
+	}.String()
+}
+
+// ErrorPrefix writes a log with a prefix to the writer provided.
+func ErrorPrefix(prefix, header string, lines ...string) string {
+	return cliMessage{
+		Style:  DefaultStyles.Error,
+		Prefix: Red(prefix) + ": ",
 		Header: header,
 		Lines:  lines,
 	}.String()
