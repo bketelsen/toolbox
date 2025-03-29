@@ -9,6 +9,18 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+var (
+	LinePrefixDefault     = "|"
+	LinePrefixBullet      = "•"
+	LinePrefixCheck       = "✓"
+	LinePrefixCross       = "✗"
+	LinePrefixWarning     = "⚠"
+	LinePrefixError       = "✖"
+	LinePrefixSuccess     = "✔"
+	LinePrefixQuestion    = "?"
+	LinePrefixDoubleAngle = "»"
+)
+
 // cliMessage provides a human-readable message for CLI errors and messages.
 type cliMessage struct {
 	Style      lipgloss.Style
