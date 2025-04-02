@@ -447,6 +447,16 @@ func (c *Command) Config() *viper.Viper {
 
 func (c *Command) GlobalConfig() *viper.Viper {
 	if c.HasParent() {
+		return c.Root().Config()
+	}
+	if c.config == nil {
+		c.config = viper.New()
+	}
+	return c.config
+}
+
+func (c *Command) ParentConfig() *viper.Viper {
+	if c.HasParent() {
 		return c.parent.Config()
 	}
 	if c.config == nil {
@@ -1143,11 +1153,13 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 	replacer := strings.NewReplacer(".", "_", "-", "")
 
 	// initialize the root command's config
+	slog.Info("Initializing config", "command", c.Name())
 	if c.InitConfig != nil {
 		c.config = c.InitConfig()
 	} else {
 		c.config = viper.New()
 	}
+
 	c.PersistentFlags().VisitAll(func(f *flag.Flag) {
 		c.config.BindPFlag(f.Name, f)
 		pfx := c.config.GetEnvPrefix()
@@ -1215,6 +1227,41 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 			cmd.config = cmd.InitConfig()
 		} else {
 			cmd.config = viper.New()
+		}
+		if cmd.parent != nil {
+			slog.Info("Initializing parent config", "command", cmd.Name(), "parent", cmd.parent.Name())
+
+			if cmd.parent.InitConfig != nil {
+				cmd.parent.config = cmd.parent.InitConfig()
+			} else {
+				cmd.parent.config = viper.New()
+			}
+			cmd.parent.PersistentFlags().VisitAll(func(f *flag.Flag) {
+				cmd.parent.config.BindPFlag(f.Name, f)
+				pfx := cmd.parent.config.GetEnvPrefix()
+				if pfx != "" {
+					pfx = strings.ToUpper(pfx) + "_"
+				}
+				if f.Annotations == nil {
+					f.Annotations = make(map[string][]string)
+				}
+				f.Annotations[FlagHasEnv] = []string{"true"}
+				f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
+
+			})
+			cmd.parent.LocalFlags().VisitAll(func(f *flag.Flag) {
+				cmd.parent.config.BindPFlag(f.Name, f)
+				pfx := cmd.parent.config.GetEnvPrefix()
+				if pfx != "" {
+					pfx = strings.ToUpper(pfx) + "_"
+				}
+				if f.Annotations == nil {
+					f.Annotations = make(map[string][]string)
+				}
+				f.Annotations[FlagHasEnv] = []string{"true"}
+				f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
+
+			})
 		}
 
 		cmd.PersistentFlags().VisitAll(func(f *flag.Flag) {
