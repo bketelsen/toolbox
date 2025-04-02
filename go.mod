@@ -12,6 +12,7 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/inconshreveable/mousetrap v1.1.0
 	github.com/jedib0t/go-pretty/v6 v6.6.6
+	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/muesli/mango v0.2.0
 	github.com/muesli/mango-pflag v0.1.0
 	github.com/muesli/roff v0.1.0

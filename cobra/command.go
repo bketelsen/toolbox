@@ -1636,7 +1636,7 @@ func (c *Command) UseLineTerm() string {
 		return useline
 	}
 	if c.HasAvailableFlags() && !strings.Contains(useline, "[flags]") {
-		useline += " [flags]"
+		useline += Keyword(" [flags]")
 	}
 	return useline
 }
@@ -2130,8 +2130,22 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 		fmt.Fprintf(w, "  %s", c.NameAndAliases())
 	}
 	if c.HasExample() {
-		fmt.Fprintf(w, "\n\n"+Title("Examples:")+"\n")
-		fmt.Fprintf(w, "%s", c.Example)
+		fmt.Fprintf(w, "\n\n"+Title("Examples:"))
+		// split examples by new line
+		examples := strings.Split(c.Example, "\n")
+		// remove empty lines
+		for i := 0; i < len(examples); i++ {
+			if strings.TrimSpace(examples[i]) == "" {
+				examples = append(examples[:i], examples[i+1:]...)
+				i--
+			}
+		}
+		// print examples
+		for i := range examples {
+			if strings.TrimSpace(examples[i]) != "" {
+				fmt.Fprintf(w, "\n  %s", examples[i])
+			}
+		}
 	}
 	if c.HasAvailableSubCommands() {
 		cmds := c.Commands()
