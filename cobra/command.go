@@ -1153,7 +1153,6 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 	replacer := strings.NewReplacer(".", "_", "-", "")
 
 	// initialize the root command's config
-	slog.Info("Initializing config", "command", c.Name())
 	if c.InitConfig != nil {
 		c.config = c.InitConfig()
 	} else {
@@ -1229,7 +1228,6 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 			cmd.config = viper.New()
 		}
 		if cmd.parent != nil {
-			slog.Info("Initializing parent config", "command", cmd.Name(), "parent", cmd.parent.Name())
 
 			if cmd.parent.InitConfig != nil {
 				cmd.parent.config = cmd.parent.InitConfig()
