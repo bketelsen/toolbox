@@ -2223,23 +2223,26 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 	if c.HasAvailableLocalFlags() {
 		fmt.Fprintf(w, "\n\n"+Title("Flags:")+"\n")
 		fmt.Fprint(w, trimRightSpace(c.LocalFlags().FlagUsages()))
-		if c.Config().GetEnvPrefix() != "" {
-			fmt.Fprintf(w, "\n\n"+Title("Environment Variables:")+"\n")
-			c.Flags().VisitAll(func(f *flag.Flag) {
-				if f.Annotations[FlagHasEnv] != nil {
 
-					fmt.Fprintf(w, "  %s %s\n", rpad(Keyword(f.Annotations[FlagEnv][0]), 20), f.Usage)
-				}
-			})
-			fmt.Fprintln(w)
-		}
 	}
 	if c.HasAvailableInheritedFlags() {
 		fmt.Fprintf(w, "\n\n"+Title("Global Flags:")+"\n")
 		fmt.Fprint(w, trimRightSpace(c.InheritedFlags().FlagUsages()))
 	}
+	if c.Config().GetEnvPrefix() != "" {
+		sb := strings.Builder{}
+		sb.WriteString("\n\n" + Title("Environment Variables:") + "\n")
+
+		c.Flags().VisitAll(func(f *flag.Flag) {
+			if f.Annotations[FlagHasEnv] != nil {
+				sb.WriteString(fmt.Sprintf("  %s %s\n", rpad(Keyword(f.Annotations[FlagEnv][0]), 20), f.Usage))
+			}
+		})
+		out := strings.TrimSuffix(sb.String(), "\n")
+		fmt.Fprint(w, out)
+	}
 	if c.HasHelpSubCommands() {
-		fmt.Fprintf(w, "\n\n"+Title("Additional help topcis:"))
+		fmt.Fprintf(w, "\n\n"+Title("Additional help topics:"))
 		for _, subcmd := range c.Commands() {
 			if subcmd.IsAdditionalHelpTopicCommand() {
 				fmt.Fprintf(w, "\n  %s %s", rpad(subcmd.CommandPath(), subcmd.CommandPathPadding()), subcmd.Short)
