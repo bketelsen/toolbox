@@ -30,7 +30,6 @@ import (
 
 	"github.com/bketelsen/toolbox/slug"
 	flag "github.com/spf13/pflag"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -121,15 +120,6 @@ type Command struct {
 	// will print content of the "Version" variable. A shorthand "v" flag will also be added if the
 	// command does not define one.
 	Version string
-
-	// InitConfig: function to initialize the config. This function is called
-	// before the command is executed. It is used to set up a Viper instance
-	// for the command. The Viper instance created on the Root command is available
-	// to all subcommands as `cmd.GlobalConfig()`. Each subcommand also has its own
-	// Viper instance that is created by calling this function. The Viper instance
-	// created by this function is available to the command as `cmd.Config()`.
-	// If a function is not provided, a default Viper instance will be created.
-	InitConfig func() *viper.Viper
 
 	// The *Run functions are executed in the following order:
 	//   * PersistentPreRun()
@@ -236,8 +226,6 @@ type Command struct {
 	}
 
 	ctx context.Context
-
-	config *viper.Viper
 
 	// commands is the list of commands supported by this program.
 	commands []*Command
@@ -433,36 +421,6 @@ func (c *Command) InOrStdin() io.Reader {
 
 func (c *Command) SetLogger(logger *slog.Logger) {
 	c.Logger = logger
-}
-
-func (c *Command) Config() *viper.Viper {
-	// if c.HasParent() {
-	// 	return c.parent.Config()
-	// }
-	if c.config == nil {
-		c.config = viper.New()
-	}
-	return c.config
-}
-
-func (c *Command) GlobalConfig() *viper.Viper {
-	if c.HasParent() {
-		return c.Root().Config()
-	}
-	if c.config == nil {
-		c.config = viper.New()
-	}
-	return c.config
-}
-
-func (c *Command) ParentConfig() *viper.Viper {
-	if c.HasParent() {
-		return c.parent.Config()
-	}
-	if c.config == nil {
-		c.config = viper.New()
-	}
-	return c.config
 }
 
 // SetLogLevel sets the log level for the command.
@@ -1150,28 +1108,6 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 		c.ctx = context.Background()
 	}
 
-	replacer := strings.NewReplacer(".", "_", "-", "")
-
-	// initialize the root command's config
-	if c.InitConfig != nil {
-		c.config = c.InitConfig()
-	} else {
-		c.config = viper.New()
-	}
-
-	c.PersistentFlags().VisitAll(func(f *flag.Flag) {
-		c.config.BindPFlag(f.Name, f)
-		pfx := c.config.GetEnvPrefix()
-		if pfx != "" {
-			pfx = strings.ToUpper(pfx) + "_"
-		}
-		if f.Annotations == nil {
-			f.Annotations = make(map[string][]string)
-		}
-		f.Annotations[FlagHasEnv] = []string{"true"}
-		f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
-	})
-
 	// Regardless of what command execute is called on, run on Root only
 	if c.HasParent() {
 		return c.Root().ExecuteC()
@@ -1220,75 +1156,6 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 		return c, err
 	}
 
-	if c.Name() != cmd.Name() {
-		// initialize the child command's config
-		if cmd.InitConfig != nil {
-			cmd.config = cmd.InitConfig()
-		} else {
-			cmd.config = viper.New()
-		}
-		if cmd.parent != nil {
-
-			if cmd.parent.InitConfig != nil {
-				cmd.parent.config = cmd.parent.InitConfig()
-			} else {
-				cmd.parent.config = viper.New()
-			}
-			cmd.parent.PersistentFlags().VisitAll(func(f *flag.Flag) {
-				cmd.parent.config.BindPFlag(f.Name, f)
-				pfx := cmd.parent.config.GetEnvPrefix()
-				if pfx != "" {
-					pfx = strings.ToUpper(pfx) + "_"
-				}
-				if f.Annotations == nil {
-					f.Annotations = make(map[string][]string)
-				}
-				f.Annotations[FlagHasEnv] = []string{"true"}
-				f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
-
-			})
-			cmd.parent.LocalFlags().VisitAll(func(f *flag.Flag) {
-				cmd.parent.config.BindPFlag(f.Name, f)
-				pfx := cmd.parent.config.GetEnvPrefix()
-				if pfx != "" {
-					pfx = strings.ToUpper(pfx) + "_"
-				}
-				if f.Annotations == nil {
-					f.Annotations = make(map[string][]string)
-				}
-				f.Annotations[FlagHasEnv] = []string{"true"}
-				f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
-
-			})
-		}
-
-		cmd.PersistentFlags().VisitAll(func(f *flag.Flag) {
-			cmd.config.BindPFlag(f.Name, f)
-			pfx := cmd.config.GetEnvPrefix()
-			if pfx != "" {
-				pfx = strings.ToUpper(pfx) + "_"
-			}
-			if f.Annotations == nil {
-				f.Annotations = make(map[string][]string)
-			}
-			f.Annotations[FlagHasEnv] = []string{"true"}
-			f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
-
-		})
-		cmd.LocalFlags().VisitAll(func(f *flag.Flag) {
-			cmd.config.BindPFlag(f.Name, f)
-			pfx := cmd.config.GetEnvPrefix()
-			if pfx != "" {
-				pfx = strings.ToUpper(pfx) + "_"
-			}
-			if f.Annotations == nil {
-				f.Annotations = make(map[string][]string)
-			}
-			f.Annotations[FlagHasEnv] = []string{"true"}
-			f.Annotations[FlagEnv] = []string{pfx + strings.ToUpper(replacer.Replace(f.Name))}
-
-		})
-	}
 	cmd.commandCalledAs.called = true
 	if cmd.commandCalledAs.name == "" {
 		cmd.commandCalledAs.name = cmd.Name()
@@ -2229,18 +2096,7 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 		fmt.Fprintf(w, "%s", "\n\n"+Title("Global Flags:")+"\n")
 		fmt.Fprint(w, trimRightSpace(c.InheritedFlags().FlagUsages()))
 	}
-	if c.Config().GetEnvPrefix() != "" {
-		sb := strings.Builder{}
-		sb.WriteString("\n\n" + Title("Environment Variables:") + "\n")
 
-		c.Flags().VisitAll(func(f *flag.Flag) {
-			if f.Annotations[FlagHasEnv] != nil {
-				sb.WriteString(fmt.Sprintf("  %s %s\n", rpad(Keyword(f.Annotations[FlagEnv][0]), 20), f.Usage))
-			}
-		})
-		out := strings.TrimSuffix(sb.String(), "\n")
-		fmt.Fprint(w, out)
-	}
 	if c.HasHelpSubCommands() {
 		fmt.Fprintf(w, "%s", "\n\n"+Title("Additional help topics:"))
 		for _, subcmd := range c.Commands() {
