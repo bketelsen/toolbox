@@ -16,7 +16,7 @@
 package cmd
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 	"time"
 
@@ -95,7 +95,7 @@ func copyrightLine() string {
 func findLicense(name string) License {
 	found := matchLicense(name)
 	if found == "" {
-		cobra.CheckErr(fmt.Errorf("unknown license: " + name))
+		cobra.CheckErr(errors.New("unknown license: " + name))
 	}
 	return Licenses[found]
 }

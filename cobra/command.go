@@ -2171,11 +2171,11 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 		fmt.Fprintf(w, "\n  %s [command]", Keyword(c.CommandPath()))
 	}
 	if len(c.Aliases) > 0 {
-		fmt.Fprintf(w, "\n\n"+Title("Aliases:")+"\n")
+		fmt.Fprintf(w, "%s", "\n\n"+Title("Aliases:")+"\n")
 		fmt.Fprintf(w, "  %s", c.NameAndAliases())
 	}
 	if c.HasExample() {
-		fmt.Fprintf(w, "\n\n"+Title("Examples:"))
+		fmt.Fprintf(w, "%s", "\n\n"+Title("Examples:"))
 		// split examples by new line
 		examples := strings.Split(c.Example, "\n")
 		// remove empty lines
@@ -2195,7 +2195,7 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 	if c.HasAvailableSubCommands() {
 		cmds := c.Commands()
 		if len(c.Groups()) == 0 {
-			fmt.Fprintf(w, "\n\n"+Title("Available Commands:"))
+			fmt.Fprintf(w, "%s", "\n\n"+Title("Available Commands:"))
 			for _, subcmd := range cmds {
 				if subcmd.IsAvailableCommand() || subcmd.Name() == helpCommandName {
 					fmt.Fprintf(w, "\n  %s %s", Keyword(rpad(subcmd.Name(), subcmd.NamePadding())), subcmd.Short)
@@ -2203,7 +2203,7 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 			}
 		} else {
 			for _, group := range c.Groups() {
-				fmt.Fprintf(w, "\n\n"+Title(group.Title+":"))
+				fmt.Fprintf(w, "%s", "\n\n"+Title(group.Title+":"))
 				for _, subcmd := range cmds {
 					if subcmd.GroupID == group.ID && (subcmd.IsAvailableCommand() || subcmd.Name() == helpCommandName) {
 						fmt.Fprintf(w, "\n  %s %s", Keyword(rpad(subcmd.Name(), subcmd.NamePadding())), subcmd.Short)
@@ -2211,7 +2211,7 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 				}
 			}
 			if !c.AllChildCommandsHaveGroup() {
-				fmt.Fprintf(w, "\n\n"+Title("Additional Commands:"))
+				fmt.Fprintf(w, "%s", "\n\n"+Title("Additional Commands:"))
 				for _, subcmd := range cmds {
 					if subcmd.GroupID == "" && (subcmd.IsAvailableCommand() || subcmd.Name() == helpCommandName) {
 						fmt.Fprintf(w, "\n  %s %s", Keyword(rpad(subcmd.Name(), subcmd.NamePadding())), subcmd.Short)
@@ -2221,12 +2221,12 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 		}
 	}
 	if c.HasAvailableLocalFlags() {
-		fmt.Fprintf(w, "\n\n"+Title("Flags:")+"\n")
+		fmt.Fprintf(w, "%s", "\n\n"+Title("Flags:")+"\n")
 		fmt.Fprint(w, trimRightSpace(c.LocalFlags().FlagUsages()))
 
 	}
 	if c.HasAvailableInheritedFlags() {
-		fmt.Fprintf(w, "\n\n"+Title("Global Flags:")+"\n")
+		fmt.Fprintf(w, "%s", "\n\n"+Title("Global Flags:")+"\n")
 		fmt.Fprint(w, trimRightSpace(c.InheritedFlags().FlagUsages()))
 	}
 	if c.Config().GetEnvPrefix() != "" {
@@ -2242,7 +2242,7 @@ func defaultUsageFunc(w io.Writer, in interface{}) error {
 		fmt.Fprint(w, out)
 	}
 	if c.HasHelpSubCommands() {
-		fmt.Fprintf(w, "\n\n"+Title("Additional help topics:"))
+		fmt.Fprintf(w, "%s", "\n\n"+Title("Additional help topics:"))
 		for _, subcmd := range c.Commands() {
 			if subcmd.IsAdditionalHelpTopicCommand() {
 				fmt.Fprintf(w, "\n  %s %s", rpad(subcmd.CommandPath(), subcmd.CommandPathPadding()), subcmd.Short)
