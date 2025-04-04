@@ -43,10 +43,6 @@ menu:
       name: Cobra
       pageRef: /docs/cobra
       weight: 1
-    - identifier: starter
-      name: Starter Generator
-      pageRef: /docs/toolgen
-      weight: 2
     - identifier: guides
       name: Guides
       pageRef: /docs/guides

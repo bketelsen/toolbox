@@ -3,7 +3,7 @@
 version: '3'
 
 vars:
-  VERSION: 0.7.3
+  VERSION: 0.8.0
 
 tasks:
   build:
@@ -44,37 +44,7 @@ tasks:
       - git tag v{{.VERSION}}
       - git push --tags
       - GOPROXY=proxy.golang.org go list -m github.com/bketelsen/toolbox@v{{.VERSION}}
-  release-snapshot:
-    cmds:
-      - goreleaser release --snapshot --clean -f ./toolgen/.goreleaser.yaml
-    silent: true
-  release-check:
-    cmds:
-      - goreleaser check
-    silent: true
-  release-local:
-    desc: Build and install locally using goreleaser
-    vars:
-      GOOS: '{{OS}}'
-      GOARCH: '{{ARCH}}'
-    cmds:
-      - GOOS={{.GOOS}} GOARCH={{.GOARCH}} goreleaser release --single-target --snapshot --clean -f ./toolgen/.goreleaser.yaml
-      - 'cp ./dist/{{.GOOS}}_{{.GOARCH}}/toolgen_{{.GOOS}}_{{.GOARCH}}_v1/toolgen /go/bin/toolgen'
-      - 'echo Release for {{.GOOS}}/{{.GOARCH}}'
-    silent: true
-  goreleaser:
-    cmds:
-      - wget https://github.com/goreleaser/goreleaser-pro/releases/download/v2.8.1/goreleaser-pro_2.8.1_amd64.deb
-      - sudo dpkg -i goreleaser-pro_2.8.1_amd64.deb
-      - rm goreleaser-pro_2.8.1_amd64.deb
-    silent: true
-  toolgendocs:
-    desc: Generate the toolgen docs
-    deps: [release-local]
-    cmds:
-      - cp ./toolgen/install.sh ./docs/static/install.sh
-      - ./dist/linux_amd64/toolgen_linux_amd64_v1/toolgen gendocs -b "/toolbox"
-    silent: true
+
   site:
     desc: Run hugo dev server
     #deps: [build, generate]
