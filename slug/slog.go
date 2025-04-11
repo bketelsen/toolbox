@@ -5,15 +5,15 @@ import (
 	"log/slog"
 )
 
-type CtxKey string
+type ctxKey string
 
-const CtxSlogKey CtxKey = "slog"
+const ctxSlogKey ctxKey = "slog"
 
 func CtxWithSlog(ctx context.Context, slog *slog.Logger) context.Context {
-	return context.WithValue(ctx, CtxSlogKey, slog)
+	return context.WithValue(ctx, ctxSlogKey, slog)
 }
 
 func CtxSlog(ctx context.Context) (logger *slog.Logger, ok bool) {
-	logger, ok = ctx.Value(CtxSlogKey).(*slog.Logger)
+	logger, ok = ctx.Value(ctxSlogKey).(*slog.Logger)
 	return logger, ok
 }
