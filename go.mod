@@ -7,7 +7,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/huh v0.7.0
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/cpuguy83/go-md2man/v2 v2.0.6
+	github.com/cpuguy83/go-md2man/v2 v2.0.7
 	github.com/fatih/structtag v1.2.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/inconshreveable/mousetrap v1.1.0
