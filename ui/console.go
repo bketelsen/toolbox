@@ -47,6 +47,22 @@ func SetLinePrefix(prefix string) {
 	Console.SetLinePrefix(prefix)
 }
 
+func (c ConsolePrinter) TitleWarn(header string) {
+	c.Warn(header)
+}
+
+func (c ConsolePrinter) TitleInfo(header string) {
+	c.Info(header)
+}
+
+func (c ConsolePrinter) TitleSuccess(header string) {
+	c.Success(header)
+}
+
+func (c ConsolePrinter) TitleError(header string) {
+	c.Error(header)
+}
+
 func (c ConsolePrinter) Warn(header string, lines ...string) {
 	_, _ = c.stderr.Write([]byte(warn(c.linePrefix, header, lines...)))
 }
@@ -77,6 +93,22 @@ func (c ConsolePrinter) Error(header string, lines ...string) {
 
 func (c ConsolePrinter) ErrorPrefix(prefix, header string, lines ...string) {
 	_, _ = c.stderr.Write([]byte(errorPrefix(c.linePrefix, prefix, header, lines...)))
+}
+
+func TitleWarn(header string) {
+	Console.TitleWarn(header)
+}
+
+func TitleInfo(header string) {
+	Console.TitleInfo(header)
+}
+
+func TitleSuccess(header string) {
+	Console.TitleSuccess(header)
+}
+
+func TitleError(header string) {
+	Console.TitleError(header)
 }
 
 func Warn(header string, lines ...string) {

@@ -114,7 +114,7 @@ func Field(s string) string {
 func KeyValuePair(key, value string) string {
 	k := Field(key)
 	v := Keyword(value)
-	return k + ":" + v
+	return k + ": " + v
 }
 
 func init() {
@@ -134,8 +134,6 @@ func init() {
 			Foreground(red),
 
 		Field: lipgloss.NewStyle().
-			PaddingLeft(1).
-			PaddingRight(1).
 			Foreground(lipgloss.Color("#FFFFFF")).
 			Background(lipgloss.Color("#2B2A2A")),
 
