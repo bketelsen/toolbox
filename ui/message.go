@@ -41,6 +41,9 @@ func (m cliMessage) String() string {
 	str.WriteString(m.Style.Render(m.Header))
 	_, _ = str.WriteString("\r\n")
 	for _, line := range m.Lines {
+		if line == "" {
+			continue
+		}
 		_, _ = fmt.Fprintf(&str, "  %s %s\r\n", m.Style.Render(m.LinePrefix), line)
 	}
 	return str.String()
