@@ -1,4 +1,4 @@
-.PHONY: all clean fmt lint test test-cover tidy check bump help
+.PHONY: all clean fmt lint test test-cover tidy check bump install help
 
 # Go commands
 GO := go
@@ -47,6 +47,10 @@ bump:
 		git tag -a $$version -m "Version $$version"; \
 		echo "Tagged $$version"; \
 		git push origin $$version
+
+## install: Install the scaffold command
+install:
+	$(GO) install ./cmd/scaffold
 
 ## help: Show this help message
 help:
