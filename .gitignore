@@ -2,3 +2,12 @@
 docs/public
 docs/.hugo_build.lock
 /scaffold
+
+# Example binaries (built by go run/build in _examples/)
+_examples/dashboard/dashboard
+_examples/deploy/deploy
+_examples/fileprocess/fileprocess
+_examples/greet/greet
+_examples/healthcheck/healthcheck
+_examples/migration/migration
+_examples/sync/sync
