@@ -9,7 +9,6 @@ require (
 	github.com/charmbracelet/huh v1.0.0
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/fatih/structtag v1.2.0
-	github.com/iancoleman/strcase v0.3.0
 	github.com/jedib0t/go-pretty/v6 v6.6.6
 	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/muesli/termenv v0.16.0

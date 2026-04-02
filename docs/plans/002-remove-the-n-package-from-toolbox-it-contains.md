@@ -1,7 +1,7 @@
 ---
-devTaskId: "002"
-title: "Remove the n/ package from toolbox"
-status: Draft
+devTaskId: 002
+title: Remove the n/ package from toolbox
+status: Approved
 created: 2026-04-02
 author: architect
 adrNeeded: false
