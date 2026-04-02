@@ -1,4 +1,7 @@
-.PHONY: all clean fmt lint test test-cover tidy check bump install help
+.PHONY: all clean fmt lint test test-cover tidy check bump install examples help
+
+EXAMPLES := $(patsubst _examples/%/,%,$(wildcard _examples/*/))
+DIST_DIR := dist
 
 # Go commands
 GO := go
@@ -28,9 +31,19 @@ test-cover:
 tidy:
 	$(GO) mod tidy
 
+## examples: Build all examples into dist/
+examples:
+	@mkdir -p $(DIST_DIR)
+	@for ex in $(EXAMPLES); do \
+		echo "Building $$ex..."; \
+		$(GO) build -o $(DIST_DIR)/$$ex ./_examples/$$ex; \
+	done
+	@echo "All examples built in $(DIST_DIR)/"
+
 ## clean: Remove generated artifacts
 clean:
 	rm -f coverage.out coverage.html
+	rm -rf $(DIST_DIR)
 	$(GO) clean
 
 ## check: Run fmt, lint, and test
