@@ -181,11 +181,16 @@ func (s *Spinner) Run() error {
 		return s.runAccessible()
 	}
 
+	// If there's no controlling terminal, fall back to accessible mode
+	// rather than failing on OpenTTY.
+	if _, _, err := tea.OpenTTY(); err != nil {
+		return s.runAccessible()
+	}
+
 	m, err := tea.NewProgram(
 		s,
 		tea.WithContext(s.ctx),
 		tea.WithOutput(s.output),
-		tea.WithInput(nil),
 	).Run()
 	mm := m.(*Spinner)
 	if mm.err != nil {
