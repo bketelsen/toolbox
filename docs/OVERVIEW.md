@@ -3,7 +3,7 @@
 ## Purpose
 
 `github.com/bketelsen/toolbox` is a Go library providing a standardized toolkit for building CLI tools.
-It wraps Cobra, Charmbracelet (bubbletea / huh / lipgloss / fang), and Viper with opinionated defaults
+It wraps Cobra, Charmbracelet v2 (bubbletea / huh / lipgloss / fang), and Viper with opinionated defaults
 for version injection, common flags, output formatting, progress reporting, and interactive UI components.
 The library is pre-1.0; its public API is subject to change.
 
@@ -11,7 +11,7 @@ The library is pre-1.0; its public API is subject to change.
 
 ```
 github.com/bketelsen/toolbox   ← root package (main API surface)
-├── clix.go          App struct — build-time metadata + Run() entry point (fang integration)
+├── clix.go          App struct — build-time metadata + Run() entry point (fang v2 integration)
 ├── flags.go         Package-level flag globals (JSONOutput, Verbose, DryRun, Silent) + BindViper()
 ├── output.go        OutputJSON / OutputJSONError — flag-conditioned JSON helpers
 ├── reporter.go      NewReporter() factory — returns Text/JSON/Noop based on flag state
@@ -19,11 +19,9 @@ github.com/bketelsen/toolbox   ← root package (main API surface)
 ├── trace.go         Tracef() — stderr trace logging gated on TOOLBOX_TRACING=on
 │
 ├── reporter/        Reporter interface + TextReporter / JSONReporter / NoopReporter
-├── ui/              Console styling, table rendering, spinners, interactive prompts (huh)
+├── ui/              Console styling, table rendering, spinners, interactive prompts (huh v2)
 ├── slug/            Custom slog.Handler (forked from tint) for structured logging
-├── scaffold/        Scaffolding utilities
 ├── cmd/scaffold/    Cobra sub-command for the scaffold tool
-├── dashboard/       Bubbletea dashboard component
 │
 └── _examples/       Demo CLI apps (greet, dashboard, deploy, …) — not imported by library
 ```
