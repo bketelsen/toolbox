@@ -8,10 +8,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/spinner"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/muesli/termenv"
+	"github.com/charmbracelet/x/ansi"
+
+	"charm.land/bubbles/v2/spinner"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 )
 
 // Spinner represents a loading spinner.
@@ -122,13 +123,13 @@ func NewSpinner() *Spinner {
 	return &Spinner{
 		spinner:    s,
 		title:      "Loading...",
-		titleStyle: lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#00020A", Dark: "#FFFDF5"}),
+		titleStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFDF5")),
 	}
 }
 
 // Init initializes the spinner.
 func (s *Spinner) Init() tea.Cmd {
-	return tea.Batch(s.spinner.Tick, func() tea.Msg {
+	return tea.Batch(func() tea.Msg { return s.spinner.Tick() }, func() tea.Msg {
 		if s.action != nil {
 			err := s.action(s.ctx)
 			return doneMsg{err}
@@ -143,7 +144,7 @@ func (s *Spinner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case doneMsg:
 		s.err = msg.err
 		return s, tea.Quit
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		switch msg.String() {
 		case "ctrl+c":
 			return s, tea.Interrupt
@@ -156,12 +157,12 @@ func (s *Spinner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 // View returns the spinner view.
-func (s *Spinner) View() string {
+func (s *Spinner) View() tea.View {
 	var title string
 	if s.title != "" {
 		title = s.titleStyle.Render(s.title)
 	}
-	return s.spinner.View() + title
+	return tea.NewView(s.spinner.View() + title)
 }
 
 // Run runs the spinner.
@@ -196,15 +197,13 @@ func (s *Spinner) Run() error {
 // runAccessible runs the spinner in an accessible mode (statically).
 func (s *Spinner) runAccessible() error {
 	tty := cmp.Or[io.Writer](s.output, os.Stdout)
-	output := termenv.NewOutput(tty)
-	output.HideCursor()
+	_, _ = fmt.Fprint(tty, ansi.HideCursor)
 	frame := s.spinner.Style.Render("...")
 	title := s.titleStyle.Render(strings.TrimSuffix(s.title, "..."))
 	fmt.Println(title + frame)
 
 	defer func() {
-		output.ShowCursor()
-		output.CursorBack(len(frame) + len(title))
+		_, _ = fmt.Fprint(tty, ansi.ShowCursor)
 	}()
 
 	actionDone := make(chan error)

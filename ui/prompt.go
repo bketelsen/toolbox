@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/charmbracelet/huh"
+import "charm.land/huh/v2"
 
 func Prompt(title, description, placeholder string, input *string) {
 

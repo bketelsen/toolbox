@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/charmbracelet/huh"
+import "charm.land/huh/v2"
 
 func Option(title, description string, input *string, options []string) {
 

@@ -3,11 +3,13 @@
 package ui
 
 import (
+	"image/color"
+	"os"
 	"time"
 
-	"github.com/muesli/termenv"
+	"github.com/charmbracelet/colorprofile"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 // DefaultStyles compose visual elements of the UI.
@@ -33,21 +35,21 @@ type Styles struct {
 	Wrap lipgloss.Style
 }
 
-var color termenv.Profile
+var isTTY bool
 
 var (
 	// ANSI color codes
-	red           = lipgloss.Color("1")
-	green         = lipgloss.Color("2")
-	yellow        = lipgloss.Color("3")
-	magenta       = lipgloss.Color("5")
-	brightBlue    = lipgloss.Color("12")
-	brightMagenta = lipgloss.Color("13")
-	cyan          = lipgloss.Color("36")
+	red           color.Color = lipgloss.Color("1")
+	green         color.Color = lipgloss.Color("2")
+	yellow        color.Color = lipgloss.Color("3")
+	magenta       color.Color = lipgloss.Color("5")
+	brightBlue    color.Color = lipgloss.Color("12")
+	brightMagenta color.Color = lipgloss.Color("13")
+	cyan          color.Color = lipgloss.Color("36")
 )
 
 func isTerm() bool {
-	return color != termenv.Ascii
+	return isTTY
 }
 
 // Bold returns a formatter that renders text in bold
@@ -118,6 +120,8 @@ func KeyValuePair(key, value string) string {
 }
 
 func init() {
+	isTTY = colorprofile.Detect(os.Stderr, os.Environ()) > colorprofile.Ascii
+
 	// We do not adapt the color based on whether the terminal is light or dark.
 	// Doing so would require a round-trip between the program and the terminal
 	// due to the OSC query and response.

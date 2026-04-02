@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/charmbracelet/huh"
+import "charm.land/huh/v2"
 
 func Confirm(title, description string, confirm *bool) {
 

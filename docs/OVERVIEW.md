@@ -21,7 +21,6 @@ github.com/bketelsen/toolbox   ← root package (main API surface)
 ├── reporter/        Reporter interface + TextReporter / JSONReporter / NoopReporter
 ├── ui/              Console styling, table rendering, spinners, interactive prompts (huh)
 ├── slug/            Custom slog.Handler (forked from tint) for structured logging
-├── s/               String case helpers (thin wrapper around iancoleman/strcase)
 ├── scaffold/        Scaffolding utilities
 ├── cmd/scaffold/    Cobra sub-command for the scaffold tool
 ├── dashboard/       Bubbletea dashboard component
@@ -71,10 +70,6 @@ Four boolean flags are registered as persistent Cobra flags in `flags.go`:
 A custom `slog.Handler` forked from [tint](https://github.com/lmittmann/tint).
 See `slug/README.md` for handler construction options.
 
-### String utilities (`s/`)
-Thin wrappers around `iancoleman/strcase` — camelCase, snake_case, kebab-case conversions.
-No additional logic beyond delegation.
-
 ### Tracing
 `Tracef(format, args...)` writes caller-annotated lines to stderr when `TOOLBOX_TRACING=on`.
 Use `SetTracing(bool)` to toggle programmatically.
@@ -117,4 +112,4 @@ CI runs on push to `main` and on PRs via GitHub Actions:
 | Version | Change |
 |---------|--------|
 | pre-1.0 | `n/` package (`FreePort()`) removed — had zero internal callers; external consumers must remove the import |
-| pre-1.0 | `s/` package retained as thin strcase wrapper |
+| pre-1.0 | `s/` package removed — thin `iancoleman/strcase` wrapper with no tests or internal consumers; `iancoleman/strcase` dropped from `go.mod` |
