@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/bketelsen/toolbox"
-	"github.com/bketelsen/toolbox/slug"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +22,7 @@ func main() {
 			if toolbox.Verbose {
 				level = slog.LevelDebug
 			}
-			slog.SetDefault(slog.New(slug.NewHandler(os.Stderr, &slug.Options{
+			slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 				Level: level,
 			})))
 		},

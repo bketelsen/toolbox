@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/bketelsen/toolbox"
-	"github.com/bketelsen/toolbox/slug"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +30,7 @@ func main() {
 			if toolbox.Silent {
 				level = slog.LevelError + 1 // suppress everything
 			}
-			slog.SetDefault(slog.New(slug.NewHandler(os.Stderr, &slug.Options{
+			slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 				Level: level,
 			})))
 			return nil
@@ -140,7 +139,7 @@ func statusCmd() *cobra.Command {
 			r.Message("Last sync: %s", status.LastSync)
 			r.Message("Pending: %d files", status.Pending)
 			if status.Errors > 0 {
-				log.Warn("sync errors detected", slug.Err(errors.New("1 file failed checksum")))
+				log.Warn("sync errors detected", slog.Any("error", errors.New("1 file failed checksum")))
 				r.Warning("%d sync errors", status.Errors)
 			}
 			return nil
