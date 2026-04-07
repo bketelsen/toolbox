@@ -1,4 +1,4 @@
-// Pachage toolbox provides common utilities for use in other packages.
+// Package toolbox provides common utilities for use in other packages.
 package toolbox
 
 import (
