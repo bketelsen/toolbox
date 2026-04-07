@@ -1,6 +1,6 @@
-// Command greet demonstrates the toolbox.App wrapper with slug structured
+// Command greet demonstrates the toolbox.App wrapper with structured
 // logging. It showcases common flags (--verbose, --json, --dry-run) and
-// how slug integrates as the slog handler alongside OutputJSON.
+// how slog integrates alongside OutputJSON.
 package main
 
 import (
@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/bketelsen/toolbox"
-	"github.com/bketelsen/toolbox/slug"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +22,7 @@ func main() {
 			if toolbox.Verbose {
 				level = slog.LevelDebug
 			}
-			slog.SetDefault(slog.New(slug.NewHandler(os.Stderr, &slug.Options{
+			slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 				Level: level,
 			})))
 		},
