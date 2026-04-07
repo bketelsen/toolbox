@@ -1,5 +1,5 @@
 // Command sync demonstrates a multi-subcommand CLI using toolbox.App with
-// structured logging, NewReporter, BindViper, and context-propagated
+// slug structured logging, NewReporter, BindViper, and context-propagated
 // loggers. It simulates syncing files between local and remote storage.
 package main
 
@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/bketelsen/toolbox"
+	"github.com/bketelsen/toolbox/slug"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +31,7 @@ func main() {
 			if toolbox.Silent {
 				level = slog.LevelError + 1 // suppress everything
 			}
-			slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+			slog.SetDefault(slog.New(slug.NewHandler(os.Stderr, &slug.Options{
 				Level: level,
 			})))
 			return nil
@@ -139,7 +140,7 @@ func statusCmd() *cobra.Command {
 			r.Message("Last sync: %s", status.LastSync)
 			r.Message("Pending: %d files", status.Pending)
 			if status.Errors > 0 {
-				log.Warn("sync errors detected", "error", errors.New("1 file failed checksum"))
+				log.Warn("sync errors detected", slug.Err(errors.New("1 file failed checksum")))
 				r.Warning("%d sync errors", status.Errors)
 			}
 			return nil

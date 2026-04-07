@@ -42,6 +42,7 @@ import (
 	"os"
 
 	"github.com/bketelsen/toolbox"
+	"github.com/bketelsen/toolbox/slug"
 	"github.com/spf13/cobra"
 )
 
@@ -57,7 +58,7 @@ var RootCmd = &cobra.Command{
 		if toolbox.Silent {
 			level = slog.LevelError + 1
 		}
-		slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		slog.SetDefault(slog.New(slug.NewHandler(os.Stderr, &slug.Options{
 			Level: level,
 		})))
 		return toolbox.BindViper(cmd.Root())
