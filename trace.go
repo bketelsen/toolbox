@@ -12,6 +12,7 @@ import (
 
 var isTracingOn = os.Getenv("TOOLBOX_TRACING") == "on"
 
+// SetTracing enables or disables debug tracing output.
 func SetTracing(on bool) {
 	if on {
 		isTracingOn = true
@@ -19,6 +20,8 @@ func SetTracing(on bool) {
 		isTracingOn = false
 	}
 }
+
+// Tracef outputs a formatted debug trace message to stderr with file, line, and function information.
 func Tracef(format string, a ...any) {
 	if !isTracingOn {
 		return

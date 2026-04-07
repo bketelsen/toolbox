@@ -15,9 +15,13 @@ import (
 // App holds build-time metadata for a CLI application.
 // Create one in main() and call Run() to execute the root command.
 type App struct {
+	// Version is the version string of the application (e.g., "1.2.3").
 	Version string
-	Commit  string
-	Date    string
+	// Commit is the git commit hash that built this application.
+	Commit string
+	// Date is the timestamp when this application was built.
+	Date string
+	// BuiltBy is the identifier of the builder (e.g., "ci" or "local").
 	BuiltBy string
 }
 

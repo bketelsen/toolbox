@@ -12,3 +12,5 @@ _examples/greet/greet
 _examples/healthcheck/healthcheck
 _examples/migration/migration
 _examples/sync/sync
+coverage.out
+coverage.html

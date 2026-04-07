@@ -7,10 +7,7 @@ import (
 	"strings"
 )
 
-// ExpandPath is a helper function to expand a relative or home-relative path to an absolute path.
-//
-// eg. ~/.someconf -> /home/alec/.someconf
-// copied from github.com/alecthomas/kong
+// ExpandPath expands a relative or home-relative path to an absolute path.
 func ExpandPath(path string) string {
 	if filepath.IsAbs(path) {
 		return path

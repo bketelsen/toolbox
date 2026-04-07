@@ -5,13 +5,17 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Common flag values, populated when Run() registers persistent flags.
-var (
-	JSONOutput bool // --json flag value
-	Verbose    bool // --verbose / -v flag value
-	DryRun     bool // --dry-run / -n flag value
-	Silent     bool // --silent / -s flag value
-)
+// JSONOutput is set to true when the --json flag is passed.
+var JSONOutput bool
+
+// Verbose is set to true when the --verbose or -v flag is passed.
+var Verbose bool
+
+// DryRun is set to true when the --dry-run or -n flag is passed.
+var DryRun bool
+
+// Silent is set to true when the --silent or -s flag is passed.
+var Silent bool
 
 // registerFlags adds --json, --verbose, --dry-run, and --silent as persistent flags on cmd.
 func registerFlags(cmd *cobra.Command) {
