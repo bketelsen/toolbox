@@ -71,6 +71,7 @@ var RootCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(greetCmd)
 	RootCmd.AddCommand(processCmd)
+	RootCmd.AddCommand(completionCmd)
 }
 `
 
@@ -79,8 +80,8 @@ var tmplCmdRootTestGo = `package cmd
 import "testing"
 
 func TestRootCmdHasSubcommands(t *testing.T) {
-	if len(RootCmd.Commands()) < 2 {
-		t.Errorf("expected at least 2 subcommands, got %d", len(RootCmd.Commands()))
+	if len(RootCmd.Commands()) < 3 {
+		t.Errorf("expected at least 3 subcommands, got %d", len(RootCmd.Commands()))
 	}
 }
 
@@ -227,6 +228,59 @@ var processCmd = &cobra.Command{
 }
 `
 
+var tmplCmdCompletionGo = `package cmd
+
+import (
+	"os"
+
+	"github.com/spf13/cobra"
+)
+
+var completionCmd = &cobra.Command{
+	Use:   "completion",
+	Short: "Generate shell completion scripts",
+}
+
+var completionBashCmd = &cobra.Command{
+	Use:   "bash",
+	Short: "Generate bash completion script",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Root().GenBashCompletion(os.Stdout)
+	},
+}
+
+var completionZshCmd = &cobra.Command{
+	Use:   "zsh",
+	Short: "Generate zsh completion script",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Root().GenZshCompletion(os.Stdout)
+	},
+}
+
+var completionFishCmd = &cobra.Command{
+	Use:   "fish",
+	Short: "Generate fish completion script",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Root().GenFishCompletion(os.Stdout, true)
+	},
+}
+
+var completionPowerShellCmd = &cobra.Command{
+	Use:   "powershell",
+	Short: "Generate PowerShell completion script",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Root().GenPowerShellCompletion(os.Stdout)
+	},
+}
+
+func init() {
+	completionCmd.AddCommand(completionBashCmd)
+	completionCmd.AddCommand(completionZshCmd)
+	completionCmd.AddCommand(completionFishCmd)
+	completionCmd.AddCommand(completionPowerShellCmd)
+}
+`
+
 var tmplMakefile = `BINARY := {{.Name}}
 DIST    := dist
 
@@ -352,6 +406,24 @@ dry-run, verbose logging, and JSON output.
 | ` + "`--verbose`" + ` | ` + "`-v`" + `   | false   | Enable verbose/debug logging         |
 | ` + "`--dry-run`" + ` | ` + "`-n`" + `   | false   | Simulate actions without executing   |
 | ` + "`--silent`" + `  | ` + "`-s`" + `   | false   | Suppress all progress output         |
+
+## Shell Completions
+
+` + "`{{.Name}}`" + ` supports shell completion for bash, zsh, fish, and PowerShell.
+
+` + "```" + `sh
+# Bash
+source <({{.Name}} completion bash)
+
+# Zsh
+source <({{.Name}} completion zsh)
+
+# Fish
+{{.Name}} completion fish | source
+
+# PowerShell
+{{.Name}} completion powershell | Out-String | Invoke-Expression
+` + "```" + `
 
 ## Development
 

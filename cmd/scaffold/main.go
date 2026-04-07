@@ -177,6 +177,7 @@ func runScaffold(cmd *cobra.Command, args []string) error {
 		{"cmd/root_test.go", tmplCmdRootTestGo},
 		{"cmd/greet.go", tmplCmdGreetGo},
 		{"cmd/process.go", tmplCmdProcessGo},
+		{"cmd/completion.go", tmplCmdCompletionGo},
 		{"Makefile", tmplMakefile},
 		{".gitignore", tmplGitignore},
 		{"README.md", tmplReadme},
