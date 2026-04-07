@@ -20,7 +20,6 @@ github.com/bketelsen/toolbox   ← root package (main API surface)
 │
 ├── reporter/        Reporter interface + TextReporter / JSONReporter / NoopReporter
 ├── ui/              Console styling, table rendering, spinners, interactive prompts (huh v2)
-├── slug/            Custom slog.Handler (forked from tint) for structured logging
 ├── cmd/scaffold/    Cobra sub-command for the scaffold tool
 │
 └── _examples/       Demo CLI apps (greet, dashboard, deploy, …) — not imported by library
@@ -64,10 +63,6 @@ Four boolean flags are registered as persistent Cobra flags in `flags.go`:
 - `spinner.go` — bubbletea spinner wrapper
 - `confirm.go`, `prompt.go`, `option.go` — interactive prompts via huh
 
-### Structured logging (`slug/`)
-A custom `slog.Handler` forked from [tint](https://github.com/lmittmann/tint).
-See `slug/README.md` for handler construction options.
-
 ### Tracing
 `Tracef(format, args...)` writes caller-annotated lines to stderr when `TOOLBOX_TRACING=on`.
 Use `SetTracing(bool)` to toggle programmatically.
@@ -102,7 +97,6 @@ CI runs on push to `main` and on PRs via GitHub Actions:
 
 ## Detailed Documentation
 
-- [slug/README.md](../slug/README.md) — slog handler construction and options
 - [docs/plans/](plans/) — implementation plans for significant changes
 
 ## Change History (notable)
