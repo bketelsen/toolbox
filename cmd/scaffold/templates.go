@@ -20,6 +20,8 @@ var tmplGoSum = ``
 var tmplMainGo = `package main
 
 import (
+	"os"
+
 	"github.com/bketelsen/toolbox"
 	"{{.Module}}/cmd"
 )
@@ -31,7 +33,9 @@ func main() {
 		Date:    "unknown",
 		BuiltBy: "source",
 	}
-	app.Run(cmd.RootCmd)
+	if err := app.Run(cmd.RootCmd); err != nil {
+		os.Exit(1)
+	}
 }
 `
 
@@ -65,64 +69,159 @@ var RootCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(exampleCmd)
+	RootCmd.AddCommand(greetCmd)
+	RootCmd.AddCommand(processCmd)
 }
 `
 
-var tmplCmdExampleGo = `package cmd
+var tmplCmdRootTestGo = `package cmd
+
+import "testing"
+
+func TestRootCmdHasSubcommands(t *testing.T) {
+	if len(RootCmd.Commands()) < 2 {
+		t.Errorf("expected at least 2 subcommands, got %d", len(RootCmd.Commands()))
+	}
+}
+
+func TestGreetCmdRegistered(t *testing.T) {
+	found := false
+	for _, c := range RootCmd.Commands() {
+		if c.Name() == "greet" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("greet subcommand not registered on RootCmd")
+	}
+}
+
+func TestProcessCmdRegistered(t *testing.T) {
+	found := false
+	for _, c := range RootCmd.Commands() {
+		if c.Name() == "process" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("process subcommand not registered on RootCmd")
+	}
+}
+`
+
+var tmplCmdGreetGo = `package cmd
 
 import (
+	"fmt"
 	"log/slog"
 
 	"github.com/bketelsen/toolbox"
 	"github.com/spf13/cobra"
 )
 
-type exampleResult struct {
+type greetResult struct {
 	Name    string ` + "`" + `json:"name"` + "`" + `
 	Message string ` + "`" + `json:"message"` + "`" + `
 	DryRun  bool   ` + "`" + `json:"dry_run"` + "`" + `
 }
 
-var exampleCmd = &cobra.Command{
-	Use:   "example [name]",
-	Short: "Run an example workflow",
+var greetCmd = &cobra.Command{
+	Use:   "greet [name]",
+	Short: "Print a greeting",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		log := slog.With("name", name)
-		r := toolbox.NewReporter()
+		slog.Debug("preparing greeting", "name", name)
 
-		// Step 1: Validate
-		r.Step(1, 3, "Validate")
-		log.Info("validating input", "name", name)
-		log.Debug("validation detail", "length", len(name))
-
-		// Step 2: Process (skipped in dry-run)
-		r.Step(2, 3, "Process")
-		if toolbox.DryRun {
-			r.Warning("dry run: skipping process step")
-			log.Info("dry run mode, skipping process")
-		} else {
-			log.Info("processing", "name", name)
-			r.Message("processed %q", name)
+		result := greetResult{
+			Name:    name,
+			Message: fmt.Sprintf("Hello, %s!", name),
+			DryRun:  toolbox.DryRun,
 		}
 
-		// Step 3: Complete
-		r.Step(3, 3, "Complete")
-		log.Debug("completing workflow")
-
-		result := exampleResult{
-			Name:    name,
-			Message: "Hello, " + name + "!",
-			DryRun:  toolbox.DryRun,
+		if toolbox.DryRun {
+			slog.Info("dry run: skipping output", "name", name)
+			if toolbox.OutputJSON(result) {
+				return nil
+			}
+			fmt.Printf("(dry run) would greet: %s\n", name)
+			return nil
 		}
 
 		if toolbox.OutputJSON(result) {
 			return nil
 		}
 
-		r.Complete("Workflow complete", result)
+		fmt.Println(result.Message)
+		slog.Info("greeting sent", "name", name)
+		return nil
+	},
+}
+`
+
+var tmplCmdProcessGo = `package cmd
+
+import (
+	"fmt"
+	"log/slog"
+
+	"github.com/bketelsen/toolbox"
+	"github.com/spf13/cobra"
+)
+
+type processResult struct {
+	Target string ` + "`" + `json:"target"` + "`" + `
+	Status string ` + "`" + `json:"status"` + "`" + `
+	DryRun bool   ` + "`" + `json:"dry_run"` + "`" + `
+}
+
+var processCmd = &cobra.Command{
+	Use:   "process [target]",
+	Short: "Run a multi-step workflow on target",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		target := args[0]
+		log := slog.With("target", target)
+		r := toolbox.NewReporter()
+
+		// Step 1: Validate
+		r.Step(1, 3, "Validate")
+		log.Info("validating target", "target", target)
+		log.Debug("validation detail", "length", len(target))
+		if target == "" {
+			return fmt.Errorf("target must not be empty")
+		}
+		r.Message("target %q is valid", target)
+
+		// Step 2: Process (skipped in dry-run)
+		r.Step(2, 3, "Process")
+		if toolbox.DryRun {
+			r.Warning("dry run: skipping process step for %q", target)
+			log.Info("dry run mode, skipping process")
+		} else {
+			r.Progress(50, "processing...")
+			log.Info("processing target", "target", target)
+			r.Message("processed %q successfully", target)
+			r.Progress(100, "done")
+		}
+
+		// Step 3: Complete
+		r.Step(3, 3, "Complete")
+		log.Debug("workflow completing", "target", target)
+
+		result := processResult{
+			Target: target,
+			Status: "ok",
+			DryRun: toolbox.DryRun,
+		}
+
+		if toolbox.OutputJSON(result) {
+			return nil
+		}
+
+		r.Complete(fmt.Sprintf("Workflow complete for %q", target), result)
 		return nil
 	},
 }
@@ -131,13 +230,15 @@ var exampleCmd = &cobra.Command{
 var tmplMakefile = `BINARY := {{.Name}}
 DIST    := dist
 
-.PHONY: fmt lint test build tidy check
+.PHONY: fmt vet lint test build tidy check
 
 fmt:
 	gofmt -w -s .
 
-lint:
+vet:
 	go vet ./...
+
+lint: vet
 
 test:
 	go test -v ./...
@@ -148,7 +249,7 @@ build:
 tidy:
 	go mod tidy
 
-check: fmt lint test
+check: fmt vet test
 `
 
 var tmplGitignore = `# Binaries
@@ -206,19 +307,41 @@ make build
 
 ### Commands
 
-#### example
+#### greet
 
-Run an example workflow demonstrating reporter steps, dry-run support, and JSON output.
+Print a greeting. Demonstrates basic positional args, dry-run, and JSON output.
 
 ` + "```" + `sh
 # Basic usage
-{{.Name}} example myinput
+{{.Name}} greet Alice
 
-# Dry run (skip process step)
-{{.Name}} example myinput --dry-run
+# Dry run (skip output)
+{{.Name}} greet Alice --dry-run
 
 # JSON output
-{{.Name}} example myinput --json
+{{.Name}} greet Alice --json
+` + "```" + `
+
+#### process
+
+Run a multi-step workflow. Demonstrates reporter steps, progress, warnings,
+dry-run, verbose logging, and JSON output.
+
+` + "```" + `sh
+# Basic usage
+{{.Name}} process myfile.txt
+
+# Dry run (skip process step)
+{{.Name}} process myfile.txt --dry-run
+
+# JSON output
+{{.Name}} process myfile.txt --json
+
+# Verbose logging
+{{.Name}} process myfile.txt --verbose
+
+# Silent (suppress progress output)
+{{.Name}} process myfile.txt --silent
 ` + "```" + `
 
 ## Global Flags
@@ -234,10 +357,10 @@ Run an example workflow demonstrating reporter steps, dry-run support, and JSON 
 
 ` + "```" + `sh
 make fmt    # Format code
-make lint   # Run go vet
+make vet    # Run go vet
 make test   # Run tests
 make build  # Build to dist/{{.Name}}
 make tidy   # go mod tidy
-make check  # fmt + lint + test
+make check  # fmt + vet + test
 ` + "```" + `
 `
