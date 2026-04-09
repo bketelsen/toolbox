@@ -13,7 +13,7 @@
 | `.` (root) | App bootstrap + flag globals | `App`, `Run()`, `JSONOutput`, `Verbose`, `DryRun`, `Silent`, `OutputJSON`, `OutputJSONError`, `NewReporter`, `ExpandPath` |
 | `reporter/` | Structured progress reporting | `Reporter` interface, `TextReporter`, `JSONReporter`, `NoopReporter`, `ProgressEvent`, `EventType` constants |
 | `ui/` | Console output + interactive prompts | `Console` (global), `ConsolePrinter`, `DisplayTable`, `Table`, `Prompt`, `Confirm`, `Option`, `Spinner` |
-| `slug/` | `slog.Handler` (forked from tint) | Structured log formatting for terminal output |
+| `slug/` | `slog.Handler` (forked from tint) — **not yet present in codebase** | Structured log formatting for terminal output |
 
 ## App bootstrap pattern
 
@@ -121,12 +121,15 @@ For errors: `return toolbox.OutputJSONError("context message", err)`.
 | `dashboard` | `DisplayTable`, console messages, `--interactive` flag |
 | `deploy` | Multi-step `Reporter` workflow (Step/Message/Warning/Complete) |
 | `migration` | Batch progress reporting with `Progress()` percent |
+| `fileprocess` | File-based workflows with progress reporting |
+| `healthcheck` | Health check patterns with status output |
+| `sync` | Multi-subcommand CLI with Viper config + `BindViper()` |
 
 When adding a new library feature, add or update an example to show usage.
 
 ## Common pitfalls
 
 - **Do not call `BindViper()` before `Run()`** — flags must be registered first.
-- **`DisplayTable` requires exactly one `default_sort` tag** — omitting it panics.
+- **`DisplayTable` requires exactly one `default_sort` (or at least one `nosort`) tag** — omitting both returns an error.
 - **`JSONReporter` writes to stdout; `TextReporter` to stderr** — keep this distinction when constructing reporters manually.
 - **`App` fields are strings, not typed** — Version/Commit/Date are injected as raw strings via ldflags.
