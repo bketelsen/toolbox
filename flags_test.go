@@ -45,4 +45,3 @@ func TestBindViper(t *testing.T) {
 		t.Fatalf("BindViper() error = %v", err)
 	}
 }
-

@@ -44,7 +44,7 @@ func main() {
 		Date:    "unknown",
 		BuiltBy: "source",
 	}
-	app.Run(rootCmd())
+	_ = app.Run(rootCmd())
 }
 
 func rootCmd() *cobra.Command {
@@ -223,10 +223,12 @@ func runScaffold(cmd *cobra.Command, args []string) error {
 		}
 
 		if err := tmpl.Execute(fh, data); err != nil {
-			fh.Close()
+			_ = fh.Close()
 			return fmt.Errorf("render template for %s: %w", f.RelPath, err)
 		}
-		fh.Close()
+		if err := fh.Close(); err != nil {
+			return fmt.Errorf("close %s: %w", f.RelPath, err)
+		}
 
 		r.Message("wrote %s", f.RelPath)
 		generated = append(generated, generatedFile{Path: absPath, Written: true})
@@ -298,7 +300,7 @@ func isToolboxGoMod(path string) bool {
 	if err != nil {
 		return false
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // best-effort cleanup
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())

@@ -87,7 +87,7 @@ func (a *App) Run(cmd *cobra.Command) error {
 	}
 	cmd.PersistentPreRun = nil
 
-	defer a.Close()
+	defer a.Close() //nolint:errcheck // best-effort cleanup
 	return fang.Execute(
 		context.Background(),
 		cmd,

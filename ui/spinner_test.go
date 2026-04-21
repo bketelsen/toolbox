@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/bketelsen/toolbox/ui"
 	"charm.land/lipgloss/v2"
+	"github.com/bketelsen/toolbox/ui"
 )
 
 func TestNewSpinner(t *testing.T) {

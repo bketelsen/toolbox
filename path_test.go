@@ -3,6 +3,7 @@ package toolbox
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -57,7 +58,7 @@ func TestExpandPath(t *testing.T) {
 				if !filepath.IsAbs(got) {
 					t.Errorf("got %q, expected absolute path", got)
 				}
-				if !filepath.IsAbs(got) || !filepath.HasPrefix(got, filepath.Dir(got)) {
+				if !filepath.IsAbs(got) || !strings.HasPrefix(got, filepath.Dir(got)) {
 					t.Errorf("got %q, expected to end with /file", got)
 				}
 			},

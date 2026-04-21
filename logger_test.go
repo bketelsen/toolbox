@@ -48,14 +48,14 @@ func TestSetupLogger_TextHandler(t *testing.T) {
 func TestSetupLogger_WritesToFile(t *testing.T) {
 	logPath := t.TempDir() + "/test.log"
 	app := &App{LogFile: logPath}
-	defer app.Close()
+	defer func() { _ = app.Close() }()
 
 	if err := app.setupLogger(); err != nil {
 		t.Fatalf("setupLogger() error = %v", err)
 	}
 
 	app.Logger.Info("hello from test")
-	app.Close()
+	_ = app.Close()
 
 	data, err := os.ReadFile(logPath)
 	if err != nil {
@@ -78,7 +78,7 @@ func TestSetupLogger_AppendsToExistingFile(t *testing.T) {
 		t.Fatalf("setupLogger() error = %v", err)
 	}
 	app.Logger.Info("appended line")
-	app.Close()
+	_ = app.Close()
 
 	data, err := os.ReadFile(logPath)
 	if err != nil {

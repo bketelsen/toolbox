@@ -375,6 +375,6 @@ func TestIsToolboxGoMod(t *testing.T) {
 	require.NoError(t, err)
 	_, err = tmpFile.WriteString("module github.com/other/project\n\ngo 1.25.0\n")
 	require.NoError(t, err)
-	tmpFile.Close()
+	_ = tmpFile.Close()
 	assert.False(t, isToolboxGoMod(tmpFile.Name()))
 }
