@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"sync"
 	"time"
 )
@@ -24,7 +25,9 @@ func (r *JSONReporter) emit(event ProgressEvent) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	event.Timestamp = time.Now().UTC().Format(time.RFC3339)
-	_ = r.encoder.Encode(event)
+	if err := r.encoder.Encode(event); err != nil {
+		fmt.Fprintf(os.Stderr, "toolbox: reporter JSON encode error: %v\n", err)
+	}
 }
 
 func (r *JSONReporter) Step(step, total int, name string) {

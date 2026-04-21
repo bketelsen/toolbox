@@ -14,7 +14,9 @@ func OutputJSON(data any) bool {
 	}
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
-	_ = enc.Encode(data)
+	if err := enc.Encode(data); err != nil {
+		fmt.Fprintf(os.Stderr, "toolbox: JSON encode error: %v\n", err)
+	}
 	return true
 }
 

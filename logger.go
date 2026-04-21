@@ -41,7 +41,9 @@ func (a *App) setupLogger() error {
 // Close closes the log file if one was opened. Safe to call multiple times.
 func (a *App) Close() error {
 	if a.logFile != nil {
-		return a.logFile.Close()
+		err := a.logFile.Close()
+		a.logFile = nil
+		return err
 	}
 	return nil
 }

@@ -141,29 +141,35 @@ func runDashboard(cmd *cobra.Command, args []string) error {
 
 	// Option select
 	var action string
-	ui.Option(
+	if err := ui.Option(
 		"Choose an action",
 		"Select what to do with the stopped service",
 		&action,
 		[]string{"Restart", "Investigate", "Ignore"},
-	)
+	); err != nil {
+		return err
+	}
 
 	// Text prompt
 	var reason string
-	ui.Prompt(
+	if err := ui.Prompt(
 		"Reason",
 		"Why are you taking this action?",
 		"e.g. scheduled maintenance",
 		&reason,
-	)
+	); err != nil {
+		return err
+	}
 
 	// Confirm
 	var confirmed bool
-	ui.Confirm(
+	if err := ui.Confirm(
 		fmt.Sprintf("%s scheduler?", action),
 		fmt.Sprintf("Reason: %s", reason),
 		&confirmed,
-	)
+	); err != nil {
+		return err
+	}
 
 	if confirmed {
 		ui.SuccessPrefix(ui.LinePrefixCheck, "Done",

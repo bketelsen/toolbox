@@ -20,10 +20,10 @@ func FormatExamples(examples ...Example) string {
 	padStyle := DefaultStyles.Wrap.PaddingLeft(4)
 	for i, e := range examples {
 		if len(e.Description) > 0 {
-			wordwrap.WrapString(e.Description, 80)
+			wrapped := wordwrap.WrapString(e.Description, 80)
 			_, _ = sb.WriteString(
 				//
-				"  - " + padStyle.Render(e.Description + ":")[4:] + "\n\n    ",
+				"  - " + padStyle.Render(wrapped + ":")[4:] + "\n\n    ",
 			)
 		}
 		// We add 1 space here because `cliui.DefaultStyles.Code` adds an extra
@@ -45,10 +45,10 @@ func Long(description string, examples ...Example) string {
 	padStyle := DefaultStyles.Wrap.PaddingLeft(2)
 
 	if len(description) > 0 {
-		wordwrap.WrapString(description, 80)
+		wrapped := wordwrap.WrapString(description, 80)
 		_, _ = sb.WriteString(
 			//	pretty.Sprint(padStyle, description) + "\n\n",
-			padStyle.Render(description) + "\n\n",
+			padStyle.Render(wrapped) + "\n\n",
 		)
 	}
 	sb.WriteString(FormatExamples(examples...))

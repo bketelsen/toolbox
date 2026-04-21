@@ -110,30 +110,38 @@ func runScaffold(cmd *cobra.Command, args []string) error {
 
 	// Interactive mode: prompt for overrides.
 	if flagInteractive {
-		ui.Prompt(
+		if err := ui.Prompt(
 			"Module path",
 			"Go module path for go.mod",
 			module,
 			&module,
-		)
-		ui.Prompt(
+		); err != nil {
+			return fmt.Errorf("prompt cancelled: %w", err)
+		}
+		if err := ui.Prompt(
 			"Description",
 			"One-line project description",
 			description,
 			&description,
-		)
-		ui.Prompt(
+		); err != nil {
+			return fmt.Errorf("prompt cancelled: %w", err)
+		}
+		if err := ui.Prompt(
 			"Output directory",
 			"Where to create the project",
 			outDir,
 			&outDir,
-		)
-		ui.Prompt(
+		); err != nil {
+			return fmt.Errorf("prompt cancelled: %w", err)
+		}
+		if err := ui.Prompt(
 			"Toolbox path",
 			"Local path to the toolbox clone (for go.mod replace directive)",
 			toolboxPath,
 			&toolboxPath,
-		)
+		); err != nil {
+			return fmt.Errorf("prompt cancelled: %w", err)
+		}
 	}
 
 	data := templateData{

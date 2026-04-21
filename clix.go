@@ -60,6 +60,12 @@ func (a *App) VersionString() string {
 
 // Run registers common persistent flags on cmd, then executes the command
 // via fang.Execute with the formatted version string and signal handling.
+//
+// Run installs a PersistentPreRunE on cmd that initializes the logger and
+// chains any existing PersistentPreRunE/PersistentPreRun set on cmd before
+// this call. Consumers MUST set their custom pre-run logic on the root
+// command (before calling Run), NOT on subcommands — a subcommand's
+// PersistentPreRunE would shadow the root's and bypass logger setup.
 func (a *App) Run(cmd *cobra.Command) error {
 	a.defaults()
 	a.registerFlags(cmd)
