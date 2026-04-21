@@ -6,6 +6,7 @@ package toolbox
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"charm.land/fang/v2"
@@ -23,6 +24,14 @@ type App struct {
 	Date string
 	// BuiltBy is the identifier of the builder (e.g., "ci" or "local").
 	BuiltBy string
+
+	// LogFile is the path to write log output. Empty means stderr.
+	LogFile string
+	// Logger is the slog.Logger initialized during PersistentPreRunE.
+	Logger *slog.Logger
+
+	// logFile holds the open file handle for cleanup.
+	logFile *os.File
 }
 
 // defaults fills zero-value fields with sensible defaults.
@@ -53,7 +62,26 @@ func (a *App) VersionString() string {
 // via fang.Execute with the formatted version string and signal handling.
 func (a *App) Run(cmd *cobra.Command) error {
 	a.defaults()
-	registerFlags(cmd)
+	a.registerFlags(cmd)
+
+	capturedPreRunE := cmd.PersistentPreRunE
+	capturedPreRun := cmd.PersistentPreRun
+
+	cmd.PersistentPreRunE = func(c *cobra.Command, args []string) error {
+		if err := a.setupLogger(); err != nil {
+			return err
+		}
+		if capturedPreRunE != nil {
+			return capturedPreRunE(c, args)
+		}
+		if capturedPreRun != nil {
+			capturedPreRun(c, args)
+		}
+		return nil
+	}
+	cmd.PersistentPreRun = nil
+
+	defer a.Close()
 	return fang.Execute(
 		context.Background(),
 		cmd,

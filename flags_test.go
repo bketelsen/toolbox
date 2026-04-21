@@ -7,9 +7,10 @@ import (
 )
 
 func TestRegisterFlags(t *testing.T) {
+	app := &App{}
 	cmd := &cobra.Command{Use: "test"}
 
-	registerFlags(cmd)
+	app.registerFlags(cmd)
 
 	flags := []struct {
 		name      string
@@ -19,6 +20,7 @@ func TestRegisterFlags(t *testing.T) {
 		{"verbose", "v"},
 		{"dry-run", "n"},
 		{"silent", "s"},
+		{"log-file", ""},
 	}
 
 	for _, f := range flags {
@@ -34,11 +36,13 @@ func TestRegisterFlags(t *testing.T) {
 }
 
 func TestBindViper(t *testing.T) {
+	app := &App{}
 	cmd := &cobra.Command{Use: "test"}
-	registerFlags(cmd)
+	app.registerFlags(cmd)
 
 	err := BindViper(cmd)
 	if err != nil {
 		t.Fatalf("BindViper() error = %v", err)
 	}
 }
+

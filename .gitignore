@@ -14,3 +14,11 @@ _examples/migration/migration
 _examples/sync/sync
 coverage.out
 coverage.html
+
+# AI tool ephemeral state
+.agentic/
+.aspens.json
+.hatch/
+.claude/graph.json
+.claude/graph-index.json
+.claude/code-map.md
