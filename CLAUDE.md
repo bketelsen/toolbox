@@ -48,7 +48,7 @@ Key subpackages:
 
 - **`reporter/`** - `Reporter` interface with `TextReporter` (stderr), `JSONReporter` (stdout, JSON Lines with timestamps), `NoopReporter` (silent)
 - **`ui/`** - Console styling (`Info`/`Warn`/`Error`/`Success`), table rendering with struct tags (`table:"field,options"`), spinners, interactive prompts (`Confirm`/`Prompt`/`Option` via huh)
-- **`slug/`** - Custom `slog.Handler` implementation (forked from tint) for structured logging
+- **Logging** (`logger.go`) - `setupLogger()` configures `a.Logger` using stdlib `log/slog` with JSON or text handler based on `JSONOutput`; log level follows `Verbose`
 
 The `_examples/` directory contains demo CLI apps showing usage patterns (greet, dashboard, deploy, etc.).
 
